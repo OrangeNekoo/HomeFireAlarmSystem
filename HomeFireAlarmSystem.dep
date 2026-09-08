@@ -12,6 +12,8 @@
       <file>$PROJ_DIR$\Debug\Obj\main.pbi</file>
       <file>$PROJ_DIR$\Debug\Exe\HomeFireAlarmSystem.d51</file>
       <file>$TOOLKIT_DIR$\inc\ioCC2530.h</file>
+      <file>$TOOLKIT_DIR$\config\devices\Texas Instruments\lnk51ew_cc2530F256.xcl</file>
+      <file>$TOOLKIT_DIR$\lib\clib\cl-pli-nlpd-1e16x01.r51</file>
     </outputs>
     <file>
       <name>[ROOT_NODE]</name>
@@ -39,6 +41,10 @@
           <name>BICOMP</name>
           <file> 5</file>
         </tool>
+        <tool>
+          <name>ICC8051</name>
+          <file> 5</file>
+        </tool>
       </inputs>
     </file>
     <file>
@@ -47,6 +53,15 @@
         <tool>
           <name>BILINK</name>
           <file> 3</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Debug\Exe\HomeFireAlarmSystem.d51</name>
+      <inputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 6 2 7</file>
         </tool>
       </inputs>
     </file>
