@@ -13,7 +13,7 @@
 ## 全局约束
 
 - 平台：CC2530（8051 内核），系统时钟初始化为 32MHz 晶振；ZB2530 开发板 ×3，OLED（SSD1306 0.96 寸 SPI）×3
-- 引脚（逐字照抄规格）：OLED SCL=P1.2/SDA=P1.3/RST=P1.7/DC=P0.0；主节点 LED=P0.5 输出低电平点亮；DHT11 DATA=P0.7；MQ-2 AO=P0.6(AIN6)、DO=P0.5 输入；终端报警 LED=P1.0；串口 P0.2(RX)/P0.3(TX) 115200 8N1
+- 引脚（逐字照抄规格）：OLED 为 **I2C 模块**（SSD1306，从地址 0x3C/写 0x78），SCL=P1.2、SDA=P1.3（软件模拟 I2C）；主节点 LED=P0.5 输出低电平点亮；DHT11 DATA=P0.7；MQ-2 AO=P0.6(AIN6)、DO=P0.5 输入；终端报警 LED=P1.0；串口 P0.2(RX)/P0.3(TX) 115200 8N1
 - 节点 ID：0x01 主节点、0x02 温湿度节点、0x03 气体节点、0xFF 广播；RF 信道 11（2405MHz，FREQCTRL=0x0B），250kbps
 - RF 帧格式：`0xAA 0xBB | 源ID | 目标ID | 命令字 | 长度n | 数据域n | 异或校验`（校验=从源ID到数据域末尾逐字节异或）。裸机 FIFO 透明收发，**不用**硬件 AUTOCRC/帧过滤
 - 命令字：0x01 数据上报（温湿度域 `[seq,temp_i,temp_d,hum_i,hum_d]` 5B；气体域 `[seq,adc_hi,adc_lo,do]` 4B）、0x02 对时广播（域 `[年-2000,月,日,时,分,秒]` 6B）、0x03 报警状态广播（域 `[state,src]` 2B，state bit0=报警中，src：0无/1温度/2气体/3模拟）
@@ -45,7 +45,7 @@ HomeFireAlarmSystem/
 │   ├── clk.c/h       [新] 32MHz 时钟初始化
 │   ├── timer.c/h     [新] T1 1ms 时基 g_ms
 │   ├── delay.c/h     [新] 忙等 ms/us 延时（关中断区可用）
-│   ├── oled.c/h      [新] SSD1306 驱动（移植 docs/OLED资料 示例代码）
+│   ├── oled.c/h      [新] SSD1306 I2C 驱动（显示层签名沿用示例代码）
 │   ├── font16.c/h    [新] 17 汉字字模 + F6x8/F8X16 ASCII 字库
 │   ├── frame.c/h     [新] RF 帧打包/解析/异或校验
 │   ├── rf.c/h        [新] 裸机 RF 驱动（收发+中断单缓冲）
@@ -332,45 +332,140 @@ git add Common/ Master/main.c && git commit -m "feat: 时钟32MHz初始化与T1�
 
 ---
 
-### 任务 3：OLED 驱动与字库（oled / font16）
+### 任务 3：OLED 驱动与字库（oled / font16，I2C 底层）
 
 **文件：**
 - 创建：`Common/oled.c`、`Common/oled.h`、`Common/font16.c`、`Common/font16.h`
 - 修改：`Master/main.c`（验证代码）、三个 .ewp 补引用（任务 1 步骤 3 已加则跳过）
-- 参照（只读）：`docs/OLED资料/LCD_OLED示例代码/LCD.h`、`codetab.h`、`font matrix.txt`
+- 参照（只读）：`docs/OLED资料/LCD_OLED示例代码/LCD.h`、`codetab.h`、`font matrix.txt`、`docs/OLED资料/MinerU_markdown_SPEC_QG-2864TMBEG01*.md`（I2C 从地址与时序）
 
-- [ ] **步骤 1：移植 OLED 驱动为 oled.c/h**
+- [ ] **步骤 1：编写软件 I2C 底层 + SSD1306 封装 + 显示层函数**
 
-以 `docs/OLED资料/LCD_OLED示例代码/LCD.h` 全部内容为基础复制到 `Common/oled.c`（函数名与实现**原样保留**，包括 `LCD_Init/LCD_CLS/LCD_WrCmd/LCD_WrDat/LCD_Set_Pos/LCD_P6x8Str/LCD_P8x16Str/LCD_P16x16Ch/LCD_Fill/Draw_BMP/LCD_DLY_ms`），仅做三处修改：
-
-1. 引脚定义保持：`LCD_SCL P1_2 / LCD_SDA P1_3 / LCD_RST P1_7 / LCD_DC P0_0`；
-2. 删除文件内 `DelayMS`/`LCD_DLY_ms` 的私有实现，`#include "delay.h"`，`LCD_DLY_ms` 改为调用 `Delay_ms`（32MHz 下原系数会偏快一倍，统一走时基）；
-3. 在文件末尾新增反显与开关屏函数（报警界面用）：
+显示层函数（`LCD_P6x8Str`/`LCD_P8x16Str`/`LCD_P16x16Ch`/`LCD_Set_Pos` 等）**签名与示例代码完全一致**，任务 6-8 的调用代码无需任何改动；底层传输换为 GPIO 模拟 I2C（CC2530 无硬件 I2C）：
 
 ```c
-/* 追加到 Common/oled.c */
-void LCD_Invert(unsigned char on)   /* 1=整屏反显（报警），0=正常 */
+/* Common/oled.c — SSD1306 0.96寸 128×64，I2C 软件模拟（约 350kHz） */
+/* 模块 QG-2864TMBEG01（BS[2:0]=010 选 I2C），从地址 0x3C，写地址 0x78 */
+#include <ioCC2530.h>
+#include "oled.h"
+#include "delay.h"
+
+#define OLED_ADDR 0x78          /* 上屏失败改试 0x7A（0x3D） */
+
+#define SCL_H() (P1_2 = 1)
+#define SCL_L() (P1_2 = 0)
+#define SDA_H() (P1DIR &= ~0x08)          /* SDA 释放为高阻，靠模块板载上拉 */
+#define SDA_L() (P1_3 = 0, P1DIR |= 0x08) /* SDA 推挽拉低 */
+
+static void i2c_dly(void)                 /* 半周期约 0.8us @32MHz */
 {
-    LCD_WrCmd(on ? 0xA7 : 0xA6);
+    __no_operation(); __no_operation(); __no_operation();
+    __no_operation(); __no_operation(); __no_operation();
+}
+static void i2c_start(void)
+{
+    SDA_H(); SCL_H(); i2c_dly();
+    SDA_L(); i2c_dly();
+    SCL_L();
+}
+static void i2c_stop(void)
+{
+    SDA_L(); i2c_dly();
+    SCL_H(); i2c_dly();
+    SDA_H(); i2c_dly();
+}
+static void i2c_wr_byte(unsigned char dat)    /* 8 位数据 + 第 9 位读 ACK（不校验） */
+{
+    unsigned char i;
+    for(i = 0; i < 8; i++)
+    {
+        if(dat & 0x80) SDA_H(); else SDA_L();
+        dat <<= 1;
+        i2c_dly();
+        SCL_H(); i2c_dly();
+        SCL_L();
+    }
+    SDA_H();                     /* 释放 SDA 读 ACK */
+    i2c_dly();
+    SCL_H(); i2c_dly();
+    SCL_L();
+}
+/* —— SSD1306 事务封装（I2C 控制字节：0x00 命令流 / 0x40 数据流） —— */
+static void oled_cmd(unsigned char c)
+{
+    i2c_start();
+    i2c_wr_byte(OLED_ADDR);
+    i2c_wr_byte(0x00);
+    i2c_wr_byte(c);
+    i2c_stop();
+}
+static void oled_data(unsigned char d)
+{
+    i2c_start();
+    i2c_wr_byte(OLED_ADDR);
+    i2c_wr_byte(0x40);
+    i2c_wr_byte(d);
+    i2c_stop();
+}
+/* —— 显示层（签名与示例代码一致） —— */
+void LCD_WrCmd(unsigned char cmd) { oled_cmd(cmd); }
+void LCD_WrDat(unsigned char dat) { oled_data(dat); }
+void LCD_Set_Pos(unsigned char x, unsigned char y)
+{
+    LCD_WrCmd(0xb0 + y);
+    LCD_WrCmd(((x & 0xf0) >> 4) | 0x10);
+    LCD_WrCmd(x & 0x0f);        /* 示例代码此处误写 |0x01 会整体偏移 1 列，I2C 版修正 */
+}
+void LCD_Init(void)
+{
+    P1SEL &= ~0x0C;             /* P1.2/P1.3 普通 IO */
+    P1DIR |= 0x04;              /* SCL 输出；SDA 保持输入（释放） */
+    SCL_H(); SDA_H();
+    Delay_ms(100);              /* I2C 模块无复位脚，等上电稳定 */
+    LCD_WrCmd(0xae); LCD_WrCmd(0x00); LCD_WrCmd(0x10); LCD_WrCmd(0x40);
+    LCD_WrCmd(0x81); LCD_WrCmd(0xcf); LCD_WrCmd(0xa1); LCD_WrCmd(0xc8);
+    LCD_WrCmd(0xa6); LCD_WrCmd(0xa8); LCD_WrCmd(0x3f); LCD_WrCmd(0xd3);
+    LCD_WrCmd(0x00); LCD_WrCmd(0xd5); LCD_WrCmd(0x80); LCD_WrCmd(0xd9);
+    LCD_WrCmd(0xf1); LCD_WrCmd(0xda); LCD_WrCmd(0x12); LCD_WrCmd(0xdb);
+    LCD_WrCmd(0x40); LCD_WrCmd(0x20); LCD_WrCmd(0x02); LCD_WrCmd(0x8d);
+    LCD_WrCmd(0x14);            /* 电荷泵使能 */
+    LCD_WrCmd(0xa4); LCD_WrCmd(0xa6);
+    LCD_WrCmd(0xaf);            /* display ON */
+    LCD_Fill(0x00);
+}
+void LCD_Fill(unsigned char bmp_dat)
+{
+    unsigned char y, x;
+    for(y = 0; y < 8; y++)
+    {
+        LCD_WrCmd(0xb0 + y);
+        LCD_WrCmd(0x00); LCD_WrCmd(0x10);
+        for(x = 0; x < 128; x++) LCD_WrDat(bmp_dat);
+    }
+}
+void LCD_CLS(void) { LCD_Fill(0x00); }
+void LCD_Invert(unsigned char on) { LCD_WrCmd(on ? 0xA7 : 0xA6); }
+```
+
+文本显示函数照示例代码 `LCD.h` 逐行抄录（内部调用指向上面的新版 `LCD_Set_Pos`/`LCD_WrDat`，无需改动函数体）。其中 `LCD_P16x16Ch` 完整对照：
+
+```c
+void LCD_P16x16Ch(unsigned char x, unsigned char y, unsigned char N)  /* N = 汉字索引 */
+{
+    unsigned char wm;
+    unsigned int adder = 32 * N;
+    LCD_Set_Pos(x, y);
+    for(wm = 0; wm < 16; wm++) LCD_WrDat(F16x16[adder++]);
+    LCD_Set_Pos(x, y + 1);
+    for(wm = 0; wm < 16; wm++) LCD_WrDat(F16x16[adder++]);
 }
 ```
 
-`Common/oled.h`：
+`LCD_P6x8Str`、`LCD_P8x16Str` 与示例代码同名函数完全相同（循环取 F6x8/F8X16 字库写点阵），照抄即可。
 
-```c
-#ifndef OLED_H
-#define OLED_H
-void LCD_Init(void);
-void LCD_CLS(void);
-void LCD_P6x8Str(unsigned char x, unsigned char y, unsigned char ch[]);
-void LCD_P8x16Str(unsigned char x, unsigned char y, unsigned char ch[]);
-void LCD_P16x16Ch(unsigned char x, unsigned char y, unsigned char N);
-void LCD_Invert(unsigned char on);
-void LCD_Set_Pos(unsigned char x, unsigned char y);
-void LCD_WrCmd(unsigned char cmd);
-void LCD_WrDat(unsigned char dat);
-#endif
-```
+性能说明：I2C 下每字节一次完整事务（地址+控制+数据约 90us），**全屏 1024 字节约 90ms**——只出现在报警页切换（低频，可接受）；数值行局部刷新（约 40 字节 = 4ms），每 2 秒一次，无可感影响。
+
+`Common/oled.h` 与任务 1 计划一致（`LCD_Init/LCD_CLS/LCD_WrCmd/LCD_WrDat/LCD_Set_Pos/LCD_P6x8Str/LCD_P8x16Str/LCD_P16x16Ch/LCD_Invert`）。
 
 - [ ] **步骤 2：生成 font16.c/h 字库**
 
@@ -388,7 +483,7 @@ extern const unsigned char F8X16[];    /* ASCII 8x16，起始于空格 0x20 */
 #endif
 ```
 
-`Common/font16.c` 三部分：
+`Common/font16.c` 两部分：
 
 1. `F16x16[]`：把 `font matrix.txt` 中 17 组（每组两行 `{...},{...}` 共 32 字节）按索引顺序**原样抄录**合并为一维数组。示例（温、湿两字，其余 15 字机械照搬，不改动任何字节）：
 
@@ -404,9 +499,7 @@ const unsigned char F16x16[] = {
 };
 ```
 
-2. `F6x8` 与 `F8X16`：从 `docs/OLED资料/LCD_OLED示例代码/codetab.h` **整体复制**（先 Read 该文件获取数组）。
-
-3. 注意：示例 codetab.h 若使用了 IAR 特定存储修饰（如 `code`/`__code`），保持其原样；若用 `const`，也保持。三种写法在 IAR 8051 下均放入 Flash，不影响功能。
+2. `F6x8` 与 `F8X16`：从 `docs/OLED资料/LCD_OLED示例代码/codetab.h` **整体复制**（先 Read 该文件获取数组）。若 codetab.h 使用了 IAR 特定存储修饰（如 `code`/`__code`），保持原样；用 `const` 也保持——均放入 Flash，不影响功能。
 
 - [ ] **步骤 3：Master/main.c 换成上屏验证代码**
 
@@ -448,10 +541,12 @@ void main(void)
 
 - [ ] **步骤 4：编译烧录验证现象**
 
-**判定标准（此步同时验证字模方向）：**
+**判定标准（此步同时验证字模方向与 I2C 通信）：**
 1. 四行内容完整显示、无乱码、无上下颠倒的碎点——字模方向正确；
 2. 若汉字显示为上下镜像的乱码（上半/下半颠倒）：在 `LCD_P16x16Ch` 内把两个半页的写入顺序对调；若整体上下翻转：把 `LCD_Init` 里 `0xC8` 换 `0xC0`、`0xA1` 换 `0xA0` 重试；
-3. ASCII 数字清晰。
+3. ASCII 数字清晰；
+4. **全屏黑/无任何显示**（I2C 不通）：`OLED_ADDR` 改 `0x7A` 重试；把 `i2c_dly` 里 nop 数量翻倍降速到 ~200kHz；确认模块背面 BS 电阻为 I2C 配置（BS[2:0]=010）；
+5. 显示内容整体右偏 1 列：确认 `LCD_Set_Pos` 第三个命令为 `x & 0x0f`（无 `|0x01`）。
 
 - [ ] **步骤 5：Commit**
 
