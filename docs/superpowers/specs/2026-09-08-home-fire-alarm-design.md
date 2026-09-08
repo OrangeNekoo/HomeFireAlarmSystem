@@ -150,10 +150,10 @@
 
 ## 8. bridge.py（Python 桥）
 
-- 依赖：`pyserial`、`websockets`（pip 安装）
+- 运行环境：项目内便携 Python 3.11（`Python311\python.exe`，不依赖系统 Python）；依赖 `pyserial`、`websockets`，用 `Python311\python.exe -m pip install pyserial websockets` 安装
 - 结构：双线程——串口读线程逐行解析（校验失败丢弃）→ JSON → `asyncio` WS 广播；WS 收到的指令→CSV→串口写
 - 静态托管：`http.server` 于 8080 端口服务 `web/` 目录；WS 于 8081
-- 启动：`python bridge.py [COM口]`；无参数时自动枚举串口打印列表提示
+- 启动：`Python311\python.exe bridge.py [COM口]`；无参数时自动枚举串口打印列表提示
 - 上行数据额外打时间戳（桥端接收时刻，供网页曲线用）
 
 ## 9. 网页上位机（原神风格）
