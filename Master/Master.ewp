@@ -2088,6 +2088,9 @@
   <file>
     <name>$PROJ_DIR$\..\Common\uart.c</name>
   </file>
+  <file>
+    <name>$PROJ_DIR$\..\Common\rf.c</name>
+  </file>
 </project>
 
 
