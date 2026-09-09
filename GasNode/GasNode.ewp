@@ -2082,6 +2082,12 @@
   <file>
     <name>$PROJ_DIR$\..\Common\font16.c</name>
   </file>
+  <file>
+    <name>$PROJ_DIR$\..\Common\frame.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\..\Common\uart.c</name>
+  </file>
 </project>
 
 

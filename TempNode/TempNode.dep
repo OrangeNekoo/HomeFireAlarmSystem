@@ -2,44 +2,50 @@
 
 <project>
   <fileVersion>2</fileVersion>
-  <fileChecksum>3850243560</fileChecksum>
+  <fileChecksum>1196767828</fileChecksum>
   <configuration>
     <name>Debug</name>
     <outputs>
+      <file>$PROJ_DIR$\..\Common\frame.c</file>
       <file>$PROJ_DIR$\main.c</file>
       <file>$PROJ_DIR$\..\Common\clk.c</file>
-      <file>$PROJ_DIR$\Debug\Obj\clk.r51</file>
-      <file>$PROJ_DIR$\..\Common\timer.c</file>
-      <file>$PROJ_DIR$\..\Common\delay.c</file>
-      <file>$PROJ_DIR$\..\Common\font16.c</file>
       <file>$PROJ_DIR$\..\Common\oled.c</file>
-      <file>$PROJ_DIR$\Debug\Obj\delay.r51</file>
+      <file>$PROJ_DIR$\..\Common\delay.c</file>
+      <file>$PROJ_DIR$\..\Common\timer.c</file>
+      <file>$PROJ_DIR$\..\Common\font16.c</file>
+      <file>$PROJ_DIR$\..\Common\frame.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\oled.r51</file>
+      <file>$TOOLKIT_DIR$\lib\clib\cl-pli-nlpd-1e16x01.r51</file>
+      <file>$PROJ_DIR$\Debug\Exe\TempNode.d51</file>
+      <file>$TOOLKIT_DIR$\inc\intrinsics.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\clk.r51</file>
       <file>$PROJ_DIR$\Debug\Obj\font16.r51</file>
+      <file>$PROJ_DIR$\..\Common\oled.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\main.r51</file>
+      <file>$PROJ_DIR$\Debug\Obj\frame.r51</file>
+      <file>$PROJ_DIR$\..\Common\uart.c</file>
       <file>$PROJ_DIR$\..\Common\font16.h</file>
       <file>$TOOLKIT_DIR$\inc\ioCC2530.h</file>
-      <file>$PROJ_DIR$\..\Common\timer.h</file>
-      <file>$PROJ_DIR$\..\Common\oled.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\oled.r51</file>
       <file>$TOOLKIT_DIR$\inc\clib\stdbool.h</file>
-      <file>$TOOLKIT_DIR$\lib\clib\cl-pli-nlpd-1e16x01.r51</file>
-      <file>$PROJ_DIR$\Debug\Obj\main.r51</file>
-      <file>$TOOLKIT_DIR$\config\devices\Texas Instruments\lnk51ew_cc2530F256.xcl</file>
       <file>$PROJ_DIR$\Debug\Obj\timer.r51</file>
-      <file>$TOOLKIT_DIR$\inc\intrinsics.h</file>
-      <file>$PROJ_DIR$\Debug\Exe\TempNode.d51</file>
+      <file>$PROJ_DIR$\..\Common\timer.h</file>
+      <file>$TOOLKIT_DIR$\config\devices\Texas Instruments\lnk51ew_cc2530F256.xcl</file>
       <file>$PROJ_DIR$\..\Common\delay.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\uart.r51</file>
+      <file>$PROJ_DIR$\Debug\Obj\delay.r51</file>
+      <file>$PROJ_DIR$\..\Common\uart.h</file>
     </outputs>
     <file>
       <name>[ROOT_NODE]</name>
       <outputs>
         <tool>
           <name>XLINK</name>
-          <file> 20</file>
+          <file> 10</file>
         </tool>
       </outputs>
     </file>
     <file>
-      <name>$PROJ_DIR$\main.c</name>
+      <name>$PROJ_DIR$\..\Common\frame.c</name>
       <outputs>
         <tool>
           <name>ICC8051</name>
@@ -49,7 +55,22 @@
       <inputs>
         <tool>
           <name>ICC8051</name>
-          <file> 10</file>
+          <file> 19 7 22</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\main.c</name>
+      <outputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 15</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 19</file>
         </tool>
       </inputs>
     </file>
@@ -58,48 +79,18 @@
       <outputs>
         <tool>
           <name>ICC8051</name>
-          <file> 2</file>
+          <file> 12</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
           <name>ICC8051</name>
-          <file> 10</file>
+          <file> 19</file>
         </tool>
       </inputs>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\Common\timer.c</name>
-      <outputs>
-        <tool>
-          <name>ICC8051</name>
-          <file> 18</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICC8051</name>
-          <file> 10 11</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\Common\delay.c</name>
-      <outputs>
-        <tool>
-          <name>ICC8051</name>
-          <file> 7</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICC8051</name>
-          <file> 10 19 14 21 11</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\Common\font16.c</name>
+      <name>$PROJ_DIR$\..\Common\oled.c</name>
       <outputs>
         <tool>
           <name>ICC8051</name>
@@ -109,12 +100,42 @@
       <inputs>
         <tool>
           <name>ICC8051</name>
-          <file> 9</file>
+          <file> 19 11 20 14 24 22 18</file>
         </tool>
       </inputs>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\Common\oled.c</name>
+      <name>$PROJ_DIR$\..\Common\delay.c</name>
+      <outputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 26</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 19 11 20 24 22</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\Common\timer.c</name>
+      <outputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 21</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 19 22</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\Common\font16.c</name>
       <outputs>
         <tool>
           <name>ICC8051</name>
@@ -124,7 +145,7 @@
       <inputs>
         <tool>
           <name>ICC8051</name>
-          <file> 10 19 14 12 21 11 9</file>
+          <file> 18</file>
         </tool>
       </inputs>
     </file>
@@ -133,10 +154,28 @@
       <inputs>
         <tool>
           <name>XLINK</name>
-          <file> 17 2 7 8 16 13 18 15</file>
+          <file> 23 12 26 13 16 15 8 21 25 9</file>
         </tool>
       </inputs>
     </file>
+    <file>
+      <name>$PROJ_DIR$\..\Common\uart.c</name>
+      <outputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 25</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 19 27 22</file>
+        </tool>
+      </inputs>
+    </file>
+    <forcedrebuild>
+      <name>[REBUILD_ALL]</name>
+    </forcedrebuild>
   </configuration>
   <configuration>
     <name>Release</name>
@@ -144,6 +183,9 @@
     <forcedrebuild>
       <name>[MULTI_TOOL]</name>
       <tool>XLINK</tool>
+    </forcedrebuild>
+    <forcedrebuild>
+      <name>[REBUILD_ALL]</name>
     </forcedrebuild>
   </configuration>
 </project>
