@@ -14,7 +14,7 @@
 [气体节点 0x03]──RF────┘     LED+OLED报警                    pyserial+WS+静态托管   localhost:8080
 ```
 
-- RF：250kbps、信道 11（2405MHz，`FREQCTRL=0x0B`）、16 位 PANID + 短地址过滤、广播地址 0xFF；帧尾异或校验防错
+- RF：250kbps、信道 11（2405MHz，`FREQCTRL=0x0B`）、软件帧内 ID 过滤（`FRMFILT0=0` 关闭硬件过滤，按帧内目的地址字节软件过滤）、广播地址 0xFF；帧尾异或校验防错
 - 串口：USART0，115200 8N1，CSV 文本行 + `*校验` 帧尾
 - 上位机链路：`bridge.py` HTTP 静态托管 **8080** 端口，WebSocket **8081** 端口
 - 报警逻辑集中在主节点：温度 > 阈值（默认 45℃）或气体 ADC 均值 > 阈值（默认 600）即报警，带回差防抖；主节点广播报警状态，终端 OLED 切`火灾警报`（反显+闪烁）+ LED1 闪烁
@@ -107,7 +107,7 @@
 - 端口被占用时换端口或结束占用进程后重启 `bridge.py`。
 
 **RF 收不到数据 / 全部离线**
-三块板射频参数必须一致：信道 11（`FREQCTRL=0x0B`，2405MHz）、相同 PANID。检查各板天线是否焊好、节点间距不要太远、主板与终端的 PANID/地址配置是否一致（见 `Common/rf.c` 与各 `main.c`）。
+三块板射频参数必须一致：信道 11（`FREQCTRL=0x0B`，2405MHz）。注意 `FRMFILT0=0` 已关闭硬件帧过滤，收发过滤靠软件按帧内目的 ID 字节判断，SHORT_ADDR 寄存器只是占位——请检查各板天线是否焊好、节点间距不要太远、各 `main.c` 里 `NODE_ID` 与收发帧的 src/dst 配置是否正确（见 `Common/rf.c` 与各 `main.c`）。
 
 **OLED 全黑 / 不亮**
 - I2C 从地址问题：依次尝试写地址 0x78 / 0x7A；
@@ -139,6 +139,7 @@ HomeFireAlarmSystem/
 ├── Common/    共享模块（OLED/字库/RF/串口/帧编解码等）
 ├── Python311/ 便携 Python（不入库，需自备）
 ├── web/       网页上位机（index.html / main.js / style.css）
+├── web/three.min.js  Three.js 渲染库（本地文件，无需 CDN）
 ├── bridge.py  串口-WebSocket 桥
 ├── HomeFireAlarmSystem.eww  IAR 工作区
 └── docs/      任务书、传感器资料、设计规格
