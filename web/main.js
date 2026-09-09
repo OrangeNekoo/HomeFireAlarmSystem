@@ -211,9 +211,12 @@ function spin(p, step) {
   }
   pos.needsUpdate = true;
 }
+let alarmFxOn = false;
 function burstFx(on) {
-  const ov = document.getElementById("burst-overlay");
+  if (on === alarmFxOn) return;
+  alarmFxOn = on;
   if (on) {
+    const ov = document.getElementById("burst-overlay");
     ov.style.transition = "none"; ov.style.opacity = 1;      // 爆发闪
     requestAnimationFrame(() => {
       ov.style.transition = "opacity .9s ease-out"; ov.style.opacity = 0;
