@@ -8,3 +8,7 @@ Python311/
 Debug/
 *.dep
 ._*
+__pycache__/
+*.dbgdt
+*.dni
+*.wsdt
