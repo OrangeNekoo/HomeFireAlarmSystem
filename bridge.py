@@ -108,7 +108,7 @@ class Bridge:
                     continue
                 try:
                     frame = build_downlink(msg)
-                except (KeyError, ValueError, TypeError):
+                except (KeyError, ValueError, TypeError, AttributeError):
                     continue
                 if frame:
                     self.ser.write(frame)

@@ -41,8 +41,8 @@
 </main>
 <footer id="console">
   <div id="alarm-banner" hidden>⚠ 火灾警报 ⚠</div>
-  <label>温度阈值 <input id="th-temp" type="number" value="45">℃</label>
-  <label>气体阈值 <input id="th-gas" type="number" value="600"></label>
+  <label>温度阈值 <input id="th-temp" type="number" min="1" value="45">℃</label>
+  <label>气体阈值 <input id="th-gas" type="number" min="1" value="600"></label>
   <button id="btn-thresh">下发阈值</button>
   <button id="btn-test">模拟报警</button>
   <button id="btn-test-off" hidden>解除模拟</button>

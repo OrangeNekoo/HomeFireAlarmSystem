@@ -4,8 +4,12 @@ rtc_t g_rtc = {26, 1, 1, 12, 0, 0};   /* 上电默认值，等待串口对时覆
 static const u8 day_tab[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 void rtc_set(const u8 *t)
 {
-    g_rtc.year = t[0]; g_rtc.mon = t[1]; g_rtc.day = t[2];
-    g_rtc.hour = t[3]; g_rtc.min = t[4]; g_rtc.sec = t[5];
+    g_rtc.year = t[0];
+    g_rtc.mon  = (t[1] < 1) ? 1 : (t[1] > 12) ? 12 : t[1];    /* 钳位防畸形对时帧 */
+    g_rtc.day  = (t[2] < 1) ? 1 : (t[2] > 31) ? 31 : t[2];
+    g_rtc.hour = (t[3] > 23) ? 23 : t[3];
+    g_rtc.min  = (t[4] > 59) ? 59 : t[4];
+    g_rtc.sec  = (t[5] > 59) ? 59 : t[5];
 }
 void rtc_sec_tick(void)
 {
