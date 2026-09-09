@@ -2091,6 +2091,9 @@
   <file>
     <name>$PROJ_DIR$\..\Common\rf.c</name>
   </file>
+  <file>
+    <name>$PROJ_DIR$\..\Common\rtc.c</name>
+  </file>
 </project>
 
 

@@ -2091,6 +2091,12 @@
   <file>
     <name>$PROJ_DIR$\..\Common\rf.c</name>
   </file>
+  <file>
+    <name>$PROJ_DIR$\..\Common\rtc.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\dht11.c</name>
+  </file>
 </project>
 
 
