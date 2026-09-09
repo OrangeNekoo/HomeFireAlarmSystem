@@ -1,4 +1,4 @@
-/* TempNode/main.c â€” æ¸©æ¹¿åº¦èŠ‚ç‚¹ï¼ˆID=0x02ï¼‰ */
+/* TempNode/main.c ¡ª ÎÂÊª¶È½Úµã£¨ID=0x02£© */
 #include <ioCC2530.h>
 #include "..\Common\clk.h"
 #include "..\Common\timer.h"
@@ -9,9 +9,9 @@
 #include "..\Common\rf.h"
 #include "dht11.h"
 #define NODE_ID 0x02
-#define LED_ALARM P1_0                /* æ ¸å¿ƒæ¿ LED1ï¼Œä½ç”µå¹³ç‚¹äº® */
+#define LED_ALARM P1_0                /* ºËĞÄ°å LED1£¬µÍµçÆ½µãÁÁ */
 
-static u8 page_alarm = 0;             /* 1=ç«ç¾è­¦æŠ¥é¡µ */
+static u8 page_alarm = 0;             /* 1=»ğÔÖ¾¯±¨Ò³ */
 static u8 temp_i = 0, temp_d = 0, hum_i = 0, hum_d = 0;
 static u8 dirty = 0;
 
@@ -24,25 +24,25 @@ static void draw_time_row(void)
 static void draw_data_rows(void)
 {
     char b[8];
-    /* è¡Œ1ï¼ˆé¡µ2ï¼‰ï¼šæ¸©åº¦:xx.xâ„ƒ */
+    /* ĞĞ1£¨Ò³2£©£ºÎÂ¶È:xx.x¡æ */
     LCD_P16x16Ch(0, 2, 0);  LCD_P16x16Ch(16, 2, 2);
     b[0]=':'; b[1]='0'+temp_i/10; b[2]='0'+temp_i%10;
     b[3]='.'; b[4]='0'+temp_d; b[5]='\0';
     LCD_P8x16Str(32, 2, (u8 *)b);
-    LCD_P16x16Ch(72, 2, 16);          /* â„ƒ */
-    /* è¡Œ2ï¼ˆé¡µ4ï¼‰ï¼šæ¹¿åº¦:xx.x% */
+    LCD_P16x16Ch(72, 2, 16);          /* ¡æ */
+    /* ĞĞ2£¨Ò³4£©£ºÊª¶È:xx.x% */
     LCD_P16x16Ch(0, 4, 1);  LCD_P16x16Ch(16, 4, 2);
     b[0]=':'; b[1]='0'+hum_i/10; b[2]='0'+hum_i%10;
     b[3]='.'; b[4]='0'+hum_d; b[5]='%'; b[6]='\0';
     LCD_P8x16Str(32, 4, (u8 *)b);
-    /* è¡Œ3ï¼ˆé¡µ6ï¼‰ï¼šèŠ‚ç‚¹æ ‡è¯† */
+    /* ĞĞ3£¨Ò³6£©£º½Úµã±êÊ¶ */
     LCD_P8x16Str(40, 6, (u8 *)"NODE 2");
 }
 static void draw_alarm_page(void)
 {
     LCD_CLS();
     LCD_P16x16Ch(32, 3, 10); LCD_P16x16Ch(48, 3, 11);
-    LCD_P16x16Ch(64, 3, 12); LCD_P16x16Ch(80, 3, 13);   /* ç«ç¾è­¦æŠ¥ å±…ä¸­ */
+    LCD_P16x16Ch(64, 3, 12); LCD_P16x16Ch(80, 3, 13);   /* »ğÔÖ¾¯±¨ ¾ÓÖĞ */
     LCD_Invert(1);
 }
 static void draw_main_page(void)
@@ -67,12 +67,12 @@ static void handle_rf(void)
     n = frame_parse((const u8 *)rf_rxBuf, rf_rxLen, &src, &dst, &cmd, out);
     rf_rxLen = 0;
     if(!n || (dst != NODE_ID && dst != 0xFF)) return;
-    if(cmd == 0x02 && n == 6)                 /* å¯¹æ—¶å¹¿æ’­ */
+    if(cmd == 0x02 && n == 6)                 /* ¶ÔÊ±¹ã²¥ */
     {
         rtc_set(out);
         if(!page_alarm) draw_time_row();
     }
-    else if(cmd == 0x03 && n == 2)            /* æŠ¥è­¦çŠ¶æ€å¹¿æ’­ */
+    else if(cmd == 0x03 && n == 2)            /* ±¨¾¯×´Ì¬¹ã²¥ */
     {
         if((out[0] & 0x01) && !page_alarm) { page_alarm = 1; draw_alarm_page(); }
         else if(!(out[0] & 0x01) && page_alarm) { page_alarm = 0; draw_main_page(); }
@@ -94,19 +94,19 @@ void main(void)
         {
             last_1s += 1000;
             rtc_sec_tick();
-            if(page_alarm) LCD_Invert(g_rtc.sec & 1);   /* æŠ¥è­¦é¡µ 1Hz åæ˜¾é—ªçƒ */
+            if(page_alarm) LCD_Invert(g_rtc.sec & 1);   /* ±¨¾¯Ò³ 1Hz ·´ÏÔÉÁË¸ */
             else if(g_rtc.min != last_min) { last_min = g_rtc.min; draw_time_row(); }
         }
         if(g_ms - last_2s >= 2000)
         {
             last_2s += 2000;
-            EA = 0;                     /* DHT11 æ—¶åº ~5msï¼ŒæœŸé—´ä¸¢ RF å¸§å¯æ¥å—ï¼ˆ2s å‘¨æœŸï¼‰ */
+            EA = 0;                     /* DHT11 Ê±Ğò ~5ms£¬ÆÚ¼ä¶ª RF Ö¡¿É½ÓÊÜ£¨2s ÖÜÆÚ£© */
             if(DHT11_Read(&temp_i, &temp_d, &hum_i, &hum_d)) dirty = 1;
             EA = 1;
-            send_report();              /* æ•°æ®åŒ…å³å¿ƒè·³ */
+            send_report();              /* Êı¾İ°ü¼´ĞÄÌø */
             if(dirty && !page_alarm) { draw_data_rows(); dirty = 0; }
         }
         handle_rf();
-        LED_ALARM = (page_alarm && ((g_ms / 500) & 1)) ? 0 : 1;   /* 500ms ç¿»è½¬ */
+        LED_ALARM = (page_alarm && ((g_ms / 500) & 1)) ? 0 : 1;   /* 500ms ·­×ª */
     }
 }

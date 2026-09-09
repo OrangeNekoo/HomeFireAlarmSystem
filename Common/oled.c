@@ -1,21 +1,21 @@
-/* Common/oled.c â€” SSD1306 0.96å¯¸ 128Ã—64ï¼ŒI2C è½¯ä»¶æ¨¡æ‹Ÿï¼ˆçº¦ 350kHzï¼‰ */
-/* æ¨¡å— QG-2864TMBEG01ï¼ˆBS[2:0]=010 é€‰ I2Cï¼‰ï¼Œä»åœ°å€ 0x3Cï¼Œå†™åœ°å€ 0x78 */
+/* Common/oled.c ¡ª SSD1306 0.96´ç 128¡Á64£¬I2C Èí¼şÄ£Äâ£¨Ô¼ 350kHz£© */
+/* Ä£¿é QG-2864TMBEG01£¨BS[2:0]=010 Ñ¡ I2C£©£¬´ÓµØÖ· 0x3C£¬Ğ´µØÖ· 0x78 */
 #include <ioCC2530.h>
-#include <intrinsics.h>       /* __no_operation å†…å»ºå‡½æ•°å£°æ˜ï¼ˆæ¶ˆé™¤ Pe223 éšå¼å£°æ˜è­¦å‘Šï¼Œä»»åŠ¡ 2 ç»éªŒï¼‰ */
+#include <intrinsics.h>       /* __no_operation ÄÚ½¨º¯ÊıÉùÃ÷£¨Ïû³ı Pe223 ÒşÊ½ÉùÃ÷¾¯¸æ£¬ÈÎÎñ 2 ¾­Ñé£© */
 #include "oled.h"
 #include "delay.h"
 #include "font16.h"
 
-#define OLED_ADDR 0x78          /* ä¸Šå±å¤±è´¥æ”¹è¯• 0x7Aï¼ˆ0x3Dï¼‰ */
+#define OLED_ADDR 0x78          /* ÉÏÆÁÊ§°Ü¸ÄÊÔ 0x7A£¨0x3D£© */
 
-void LCD_Fill(unsigned char bmp_dat);     /* å‰ç½®å£°æ˜ï¼šLCD_Init å…ˆäºå®šä¹‰å¤„è°ƒç”¨ */
+void LCD_Fill(unsigned char bmp_dat);     /* Ç°ÖÃÉùÃ÷£ºLCD_Init ÏÈÓÚ¶¨Òå´¦µ÷ÓÃ */
 
 #define SCL_H() (P1_2 = 1)
 #define SCL_L() (P1_2 = 0)
-#define SDA_H() (P1DIR &= ~0x08)          /* SDA é‡Šæ”¾ä¸ºé«˜é˜»ï¼Œé æ¨¡å—æ¿è½½ä¸Šæ‹‰ */
-#define SDA_L() (P1_3 = 0, P1DIR |= 0x08) /* SDA æ¨æŒ½æ‹‰ä½ */
+#define SDA_H() (P1DIR &= ~0x08)          /* SDA ÊÍ·ÅÎª¸ß×è£¬¿¿Ä£¿é°åÔØÉÏÀ­ */
+#define SDA_L() (P1_3 = 0, P1DIR |= 0x08) /* SDA ÍÆÍìÀ­µÍ */
 
-static void i2c_dly(void)                 /* åŠå‘¨æœŸçº¦ 0.8us @32MHz */
+static void i2c_dly(void)                 /* °ëÖÜÆÚÔ¼ 0.8us @32MHz */
 {
     __no_operation(); __no_operation(); __no_operation();
     __no_operation(); __no_operation(); __no_operation();
@@ -32,7 +32,7 @@ static void i2c_stop(void)
     SCL_H(); i2c_dly();
     SDA_H(); i2c_dly();
 }
-static void i2c_wr_byte(unsigned char dat)    /* 8 ä½æ•°æ® + ç¬¬ 9 ä½è¯» ACKï¼ˆä¸æ ¡éªŒï¼‰ */
+static void i2c_wr_byte(unsigned char dat)    /* 8 Î»Êı¾İ + µÚ 9 Î»¶Á ACK£¨²»Ğ£Ñé£© */
 {
     unsigned char i;
     for(i = 0; i < 8; i++)
@@ -43,12 +43,12 @@ static void i2c_wr_byte(unsigned char dat)    /* 8 ä½æ•°æ® + ç¬¬ 9 ä½è¯» ACKï
         SCL_H(); i2c_dly();
         SCL_L();
     }
-    SDA_H();                     /* é‡Šæ”¾ SDA è¯» ACK */
+    SDA_H();                     /* ÊÍ·Å SDA ¶Á ACK */
     i2c_dly();
     SCL_H(); i2c_dly();
     SCL_L();
 }
-/* â€”â€” SSD1306 äº‹åŠ¡å°è£…ï¼ˆI2C æ§åˆ¶å­—èŠ‚ï¼š0x00 å‘½ä»¤æµ / 0x40 æ•°æ®æµï¼‰ â€”â€” */
+/* ¡ª¡ª SSD1306 ÊÂÎñ·â×°£¨I2C ¿ØÖÆ×Ö½Ú£º0x00 ÃüÁîÁ÷ / 0x40 Êı¾İÁ÷£© ¡ª¡ª */
 static void oled_cmd(unsigned char c)
 {
     i2c_start();
@@ -65,28 +65,28 @@ static void oled_data(unsigned char d)
     i2c_wr_byte(d);
     i2c_stop();
 }
-/* â€”â€” æ˜¾ç¤ºå±‚ï¼ˆç­¾åä¸ç¤ºä¾‹ä»£ç ä¸€è‡´ï¼‰ â€”â€” */
+/* ¡ª¡ª ÏÔÊ¾²ã£¨Ç©ÃûÓëÊ¾Àı´úÂëÒ»ÖÂ£© ¡ª¡ª */
 void LCD_WrCmd(unsigned char cmd) { oled_cmd(cmd); }
 void LCD_WrDat(unsigned char dat) { oled_data(dat); }
 void LCD_Set_Pos(unsigned char x, unsigned char y)
 {
     LCD_WrCmd(0xb0 + y);
     LCD_WrCmd(((x & 0xf0) >> 4) | 0x10);
-    LCD_WrCmd(x & 0x0f);        /* ç¤ºä¾‹ä»£ç æ­¤å¤„è¯¯å†™ |0x01 ä¼šæ•´ä½“åç§» 1 åˆ—ï¼ŒI2C ç‰ˆä¿®æ­£ */
+    LCD_WrCmd(x & 0x0f);        /* Ê¾Àı´úÂë´Ë´¦ÎóĞ´ |0x01 »áÕûÌåÆ«ÒÆ 1 ÁĞ£¬I2C °æĞŞÕı */
 }
 void LCD_Init(void)
 {
-    P1SEL &= ~0x0C;             /* P1.2/P1.3 æ™®é€š IO */
-    P1DIR |= 0x04;              /* SCL è¾“å‡ºï¼›SDA ä¿æŒè¾“å…¥ï¼ˆé‡Šæ”¾ï¼‰ */
+    P1SEL &= ~0x0C;             /* P1.2/P1.3 ÆÕÍ¨ IO */
+    P1DIR |= 0x04;              /* SCL Êä³ö£»SDA ±£³ÖÊäÈë£¨ÊÍ·Å£© */
     SCL_H(); SDA_H();
-    Delay_ms(100);              /* I2C æ¨¡å—æ— å¤ä½è„šï¼Œç­‰ä¸Šç”µç¨³å®š */
+    Delay_ms(100);              /* I2C Ä£¿éÎŞ¸´Î»½Å£¬µÈÉÏµçÎÈ¶¨ */
     LCD_WrCmd(0xae); LCD_WrCmd(0x00); LCD_WrCmd(0x10); LCD_WrCmd(0x40);
     LCD_WrCmd(0x81); LCD_WrCmd(0xcf); LCD_WrCmd(0xa1); LCD_WrCmd(0xc8);
     LCD_WrCmd(0xa6); LCD_WrCmd(0xa8); LCD_WrCmd(0x3f); LCD_WrCmd(0xd3);
     LCD_WrCmd(0x00); LCD_WrCmd(0xd5); LCD_WrCmd(0x80); LCD_WrCmd(0xd9);
     LCD_WrCmd(0xf1); LCD_WrCmd(0xda); LCD_WrCmd(0x12); LCD_WrCmd(0xdb);
     LCD_WrCmd(0x40); LCD_WrCmd(0x20); LCD_WrCmd(0x02); LCD_WrCmd(0x8d);
-    LCD_WrCmd(0x14);            /* ç”µè·æ³µä½¿èƒ½ */
+    LCD_WrCmd(0x14);            /* µçºÉ±ÃÊ¹ÄÜ */
     LCD_WrCmd(0xa4); LCD_WrCmd(0xa6);
     LCD_WrCmd(0xaf);            /* display ON */
     LCD_Fill(0x00);
@@ -103,7 +103,7 @@ void LCD_Fill(unsigned char bmp_dat)
 }
 void LCD_CLS(void) { LCD_Fill(0x00); }
 void LCD_Invert(unsigned char on) { LCD_WrCmd(on ? 0xA7 : 0xA6); }
-/***************åŠŸèƒ½æè¿°ï¼šæ˜¾ç¤º6*8ä¸€ç»„æ ‡å‡†ASCIIå­—ç¬¦ä¸²    æ˜¾ç¤ºçš„åæ ‡ï¼ˆx,yï¼‰ï¼Œyä¸ºé¡µèŒƒå›´0ï½7****************/
+/***************¹¦ÄÜÃèÊö£ºÏÔÊ¾6*8Ò»×é±ê×¼ASCII×Ö·û´®    ÏÔÊ¾µÄ×ø±ê£¨x,y£©£¬yÎªÒ³·¶Î§0¡«7****************/
 void LCD_P6x8Str(unsigned char x, unsigned char y, unsigned char ch[])
 {
     unsigned char c = 0, i = 0, j = 0;
@@ -118,7 +118,7 @@ void LCD_P6x8Str(unsigned char x, unsigned char y, unsigned char ch[])
         j++;
     }
 }
-/*******************åŠŸèƒ½æè¿°ï¼šæ˜¾ç¤º8*16ä¸€ç»„æ ‡å‡†ASCIIå­—ç¬¦ä¸²     æ˜¾ç¤ºçš„åæ ‡ï¼ˆx,yï¼‰ï¼Œyä¸ºé¡µèŒƒå›´0ï½7****************/
+/*******************¹¦ÄÜÃèÊö£ºÏÔÊ¾8*16Ò»×é±ê×¼ASCII×Ö·û´®     ÏÔÊ¾µÄ×ø±ê£¨x,y£©£¬yÎªÒ³·¶Î§0¡«7****************/
 void LCD_P8x16Str(unsigned char x, unsigned char y, unsigned char ch[])
 {
     unsigned char c = 0, i = 0, j = 0;
@@ -136,8 +136,8 @@ void LCD_P8x16Str(unsigned char x, unsigned char y, unsigned char ch[])
         j++;
     }
 }
-/*****************åŠŸèƒ½æè¿°ï¼šæ˜¾ç¤º16*16ç‚¹é˜µ  æ˜¾ç¤ºçš„åæ ‡ï¼ˆx,yï¼‰ï¼Œyä¸ºé¡µèŒƒå›´0ï½7****************************/
-void LCD_P16x16Ch(unsigned char x, unsigned char y, unsigned char N)  /* N = æ±‰å­—ç´¢å¼• */
+/*****************¹¦ÄÜÃèÊö£ºÏÔÊ¾16*16µãÕó  ÏÔÊ¾µÄ×ø±ê£¨x,y£©£¬yÎªÒ³·¶Î§0¡«7****************************/
+void LCD_P16x16Ch(unsigned char x, unsigned char y, unsigned char N)  /* N = ºº×ÖË÷Òı */
 {
     unsigned char wm;
     unsigned int adder = 32 * N;

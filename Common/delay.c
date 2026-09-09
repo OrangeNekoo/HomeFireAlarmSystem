@@ -1,12 +1,12 @@
 /* Common/delay.c */
 #include <ioCC2530.h>
-#include <intrinsics.h>       /* __no_operation å†…å»ºå‡½æ•°å£°æ˜ï¼ˆæ¶ˆé™¤ Pe223 éšå¼å£°æ˜è­¦å‘Šï¼‰ */
+#include <intrinsics.h>       /* __no_operation ÄÚ½¨º¯ÊıÉùÃ÷£¨Ïû³ı Pe223 ÒşÊ½ÉùÃ÷¾¯¸æ£© */
 #include "delay.h"
 void Delay_ms(u16 ms)
 {
     u16 i;
     while(ms--)
-        for(i = 0; i < 1070; i++);   /* 32MHz ä¸‹å®æµ‹çº¦ 1msï¼Œä»»åŠ¡ 6 æ ¡å‡† DHT11 æ—¶éªŒè¯ */
+        for(i = 0; i < 1070; i++);   /* 32MHz ÏÂÊµ²âÔ¼ 1ms£¬ÈÎÎñ 6 Ğ£×¼ DHT11 Ê±ÑéÖ¤ */
 }
 void Delay_us(u16 us)
 {

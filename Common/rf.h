@@ -3,8 +3,8 @@
 #define RF_H
 #include "timer.h"
 #define RF_RX_MAX 36
-extern volatile u8 rf_rxBuf[RF_RX_MAX];   /* æœ€è¿‘ä¸€å¸§åŸå§‹å­—èŠ‚ */
-extern volatile u8 rf_rxLen;              /* >0 è¡¨ç¤ºæœ‰å¾…å¤„ç†å¸§ï¼Œå¤„ç†åæ¸… 0 */
+extern volatile u8 rf_rxBuf[RF_RX_MAX];   /* ×î½üÒ»Ö¡Ô­Ê¼×Ö½Ú */
+extern volatile u8 rf_rxLen;              /* >0 ±íÊ¾ÓĞ´ı´¦ÀíÖ¡£¬´¦ÀíºóÇå 0 */
 void RF_Init(void);
-u8   RF_Send(const u8 *data, u8 len);     /* å‘ä¸€å¸§åŸå§‹æ•°æ®ï¼Œ1=æˆåŠŸ */
+u8   RF_Send(const u8 *data, u8 len);     /* ·¢Ò»Ö¡Ô­Ê¼Êı¾İ£¬1=³É¹¦ */
 #endif

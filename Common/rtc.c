@@ -1,11 +1,11 @@
 /* Common/rtc.c */
 #include "rtc.h"
-rtc_t g_rtc = {26, 1, 1, 12, 0, 0};   /* ä¸Šç”µé»˜è®¤å€¼ï¼Œç­‰å¾…ä¸²å£å¯¹æ—¶è¦†ç›– */
+rtc_t g_rtc = {26, 1, 1, 12, 0, 0};   /* ÉÏµçÄ¬ÈÏÖµ£¬µÈ´ı´®¿Ú¶ÔÊ±¸²¸Ç */
 static const u8 day_tab[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 void rtc_set(const u8 *t)
 {
     g_rtc.year = t[0];
-    g_rtc.mon  = (t[1] < 1) ? 1 : (t[1] > 12) ? 12 : t[1];    /* é’³ä½é˜²ç•¸å½¢å¯¹æ—¶å¸§ */
+    g_rtc.mon  = (t[1] < 1) ? 1 : (t[1] > 12) ? 12 : t[1];    /* Ç¯Î»·À»ûĞÎ¶ÔÊ±Ö¡ */
     g_rtc.day  = (t[2] < 1) ? 1 : (t[2] > 31) ? 31 : t[2];
     g_rtc.hour = (t[3] > 23) ? 23 : t[3];
     g_rtc.min  = (t[4] > 59) ? 59 : t[4];
@@ -21,7 +21,7 @@ void rtc_sec_tick(void)
     if(++g_rtc.hour < 24) return;
     g_rtc.hour = 0;
     max = day_tab[g_rtc.mon - 1];
-    if(g_rtc.mon == 2 && (g_rtc.year % 4) == 0) max = 29;   /* 20xx é—°å¹´ç®€åŒ–è§„åˆ™ */
+    if(g_rtc.mon == 2 && (g_rtc.year % 4) == 0) max = 29;   /* 20xx ÈòÄê¼ò»¯¹æÔò */
     if(++g_rtc.day <= max) return;
     g_rtc.day = 1;
     if(++g_rtc.mon <= 12) return;

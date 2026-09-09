@@ -1,23 +1,23 @@
-/* TempNode/dht11.c â€” æ•°æ®è„š P0.7ï¼Œè¯»å–å…¨ç¨‹ ~5msï¼Œè°ƒç”¨æ–¹éœ€ EA=0 ä¿æŠ¤ */
+/* TempNode/dht11.c ¡ª Êı¾İ½Å P0.7£¬¶ÁÈ¡È«³Ì ~5ms£¬µ÷ÓÃ·½Ğè EA=0 ±£»¤ */
 #include <ioCC2530.h>
 #include "dht11.h"
 #include "delay.h"
 #define DHT P0_7
-static u8 read_byte(u8 *dat)   /* è¿”å› 0=è¶…æ—¶å¤±è´¥ï¼ˆè¯»å–ä¸­é€”æ‹”çº¿æ—¶é˜²æ­»å¾ªç¯ï¼‰ */
+static u8 read_byte(u8 *dat)   /* ·µ»Ø 0=³¬Ê±Ê§°Ü£¨¶ÁÈ¡ÖĞÍ¾°ÎÏßÊ±·ÀËÀÑ­»·£© */
 {
     u8 i, d = 0;
     u16 t;
     for(i = 0; i < 8; i++)
     {
         t = 3000;
-        while(DHT == 0)  if(--t == 0) return 0;   /* ç­‰å¾…æœ¬ä½ 50us ä½ç”µå¹³ç»“æŸ */
-        Delay_us(40);         /* 40us åé‡‡æ ·ï¼šé«˜æŒç»­ 26-28us=0ï¼Œ70us=1 */
+        while(DHT == 0)  if(--t == 0) return 0;   /* µÈ´ı±¾Î» 50us µÍµçÆ½½áÊø */
+        Delay_us(40);         /* 40us ºó²ÉÑù£º¸ß³ÖĞø 26-28us=0£¬70us=1 */
         d <<= 1;
         if(DHT == 1)
         {
             d |= 0x01;
             t = 3000;
-            while(DHT == 1)  if(--t == 0) return 0;   /* ç­‰å¾…é«˜ç”µå¹³ç»“æŸ */
+            while(DHT == 1)  if(--t == 0) return 0;   /* µÈ´ı¸ßµçÆ½½áÊø */
         }
     }
     *dat = d;
@@ -27,16 +27,16 @@ u8 DHT11_Read(u8 *temp_i, u8 *temp_d, u8 *hum_i, u8 *hum_d)
 {
     u8 buf[5], i;
     u16 t;
-    P0DIR |= 0x80;            /* è¾“å‡º */
+    P0DIR |= 0x80;            /* Êä³ö */
     DHT = 0;
-    Delay_ms(20);             /* ä¸»æœºæ‹‰ä½ â‰¥18ms */
+    Delay_ms(20);             /* Ö÷»úÀ­µÍ ¡İ18ms */
     DHT = 1;
-    Delay_us(30);             /* é‡Šæ”¾æ€»çº¿ 20-40us */
-    P0DIR &= ~0x80;           /* åˆ‡è¾“å…¥ */
+    Delay_us(30);             /* ÊÍ·Å×ÜÏß 20-40us */
+    P0DIR &= ~0x80;           /* ÇĞÊäÈë */
     t = 3000;
-    while(DHT == 0)  if(--t == 0) return 0;   /* DHT å“åº” 80us ä½ */
+    while(DHT == 0)  if(--t == 0) return 0;   /* DHT ÏìÓ¦ 80us µÍ */
     t = 3000;
-    while(DHT == 1)  if(--t == 0) return 0;   /* DHT å“åº” 80us é«˜ */
+    while(DHT == 1)  if(--t == 0) return 0;   /* DHT ÏìÓ¦ 80us ¸ß */
     for(i = 0; i < 5; i++)
         if(!read_byte(&buf[i])) return 0;
     if((u8)(buf[0] + buf[1] + buf[2] + buf[3]) != buf[4]) return 0;

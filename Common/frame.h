@@ -4,8 +4,8 @@
 #include "timer.h"
 #define FRAME_MAX_LEN 32
 u8 frame_pack(u8 *buf, u8 src, u8 dst, u8 cmd, const u8 *data, u8 len);
-/* è¿”å›æ‰“åŒ…åæ€»é•¿ï¼ˆ0=å¤±è´¥ï¼‰ï¼›buf è‡³å°‘ FRAME_MAX_LEN å­—èŠ‚ */
+/* ·µ»Ø´ò°üºó×Ü³¤£¨0=Ê§°Ü£©£»buf ÖÁÉÙ FRAME_MAX_LEN ×Ö½Ú */
 u8 frame_parse(const u8 *buf, u8 len, u8 *src, u8 *dst, u8 *cmd, u8 *out);
-/* è¿”å›æ•°æ®åŸŸé•¿åº¦ï¼ˆ0=éæ³•/æ ¡éªŒé”™ï¼‰ï¼›out è‡³å°‘ FRAME_MAX_LEN-7 å­—èŠ‚ */
-u8 frame_selftest(u8 *buf);      /* è‡ªæµ‹ï¼šè¿”å› 1=é€šè¿‡ */
+/* ·µ»ØÊı¾İÓò³¤¶È£¨0=·Ç·¨/Ğ£Ñé´í£©£»out ÖÁÉÙ FRAME_MAX_LEN-7 ×Ö½Ú */
+u8 frame_selftest(u8 *buf);      /* ×Ô²â£º·µ»Ø 1=Í¨¹ı */
 #endif

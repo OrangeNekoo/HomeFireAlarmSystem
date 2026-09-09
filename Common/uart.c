@@ -1,4 +1,4 @@
-/* Common/uart.c â€” è¡Œç¼“å†²ï¼šä¸€å¸§ä¸€è¡Œï¼ˆæ³¢ç‰¹ç‡ 115200ï¼Œè¡Œæœ€é•¿çº¦ 40 å­—ç¬¦ï¼‰ */
+/* Common/uart.c ¡ª ĞĞ»º³å£ºÒ»Ö¡Ò»ĞĞ£¨²¨ÌØÂÊ 115200£¬ĞĞ×î³¤Ô¼ 40 ×Ö·û£© */
 #include <ioCC2530.h>
 #include "uart.h"
 volatile u8 uart_line[UART_RX_BUF];
@@ -7,12 +7,12 @@ static u8 line_len = 0;
 
 void UART_Init(void)
 {
-    PERCFG &= ~0x01;              /* USART0 ä½ç½® 1ï¼šP0.2 RXã€P0.3 TX */
-    P0SEL |= 0x0C;                /* P0.2/P0.3 å¤–è®¾åŠŸèƒ½ */
+    PERCFG &= ~0x01;              /* USART0 Î»ÖÃ 1£ºP0.2 RX¡¢P0.3 TX */
+    P0SEL |= 0x0C;                /* P0.2/P0.3 ÍâÉè¹¦ÄÜ */
     U0GCR = 12; U0BAUD = 216;     /* 115200 @ 32MHz */
-    U0CSR |= 0xC0;                /* UART æ¨¡å¼ + æ¥æ”¶ä½¿èƒ½ */
+    U0CSR |= 0xC0;                /* UART Ä£Ê½ + ½ÓÊÕÊ¹ÄÜ */
     UTX0IF = 0;
-    URX0IE = 1;                   /* æ¥æ”¶ä¸­æ–­ä½¿èƒ½ */
+    URX0IE = 1;                   /* ½ÓÊÕÖĞ¶ÏÊ¹ÄÜ */
     EA = 1;
 }
 void UART_SendBytes(const u8 *s, u8 len)
@@ -23,7 +23,7 @@ void UART_SendStr(const char *s)
 {
     while(*s) { U0DBUF = *s++; while(!UTX0IF); UTX0IF = 0; }
 }
-void uart_line_consume(void)      /* ä¸»å¾ªç¯å–èµ°è¡Œåå¤ä½ç¼“å†² */
+void uart_line_consume(void)      /* Ö÷Ñ­»·È¡×ßĞĞºó¸´Î»»º³å */
 {
     uart_line_ready = 0;
     line_len = 0;
@@ -37,11 +37,11 @@ __interrupt void URX0_ISR(void)
         if(line_len > 0)
         {
             uart_line[line_len] = '\0';
-            uart_line_ready = 1;      /* è¡Œå°±ç»ªï¼Œç­‰ä¸»å¾ªç¯å–èµ° */
+            uart_line_ready = 1;      /* ĞĞ¾ÍĞ÷£¬µÈÖ÷Ñ­»·È¡×ß */
         }
     }
     else if(!uart_line_ready && line_len < UART_RX_BUF - 1)
     {
-        uart_line[line_len++] = ch;   /* ä¸Šä¸€è¡Œæœªè¢«å–èµ°æœŸé—´ä¸¢å¼ƒæ–°å­—ç¬¦ï¼ˆä¸Šè¡Œé¢‘ç‡ 0.5Hzï¼Œä¸ä¼šå‘ç”Ÿï¼‰ */
+        uart_line[line_len++] = ch;   /* ÉÏÒ»ĞĞÎ´±»È¡×ßÆÚ¼ä¶ªÆúĞÂ×Ö·û£¨ÉÏĞĞÆµÂÊ 0.5Hz£¬²»»á·¢Éú£© */
     }
 }

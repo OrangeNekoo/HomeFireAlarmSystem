@@ -1,4 +1,4 @@
-/* GasNode/main.c â€” æ°”ä½“èŠ‚ç‚¹ï¼ˆID=0x03ï¼‰ */
+/* GasNode/main.c ¡ª ÆøÌå½Úµã£¨ID=0x03£© */
 #include <ioCC2530.h>
 #include "..\Common\clk.h"
 #include "..\Common\timer.h"
@@ -9,13 +9,13 @@
 #include "..\Common\rf.h"
 #include "adc.h"
 #define NODE_ID 0x03
-#define LED_ALARM P1_0                /* æ ¸å¿ƒæ¿ LED1ï¼Œä½ç”µå¹³ç‚¹äº® */
-#define MQ2_DO P0_5                   /* DOï¼šè¶…æ¨¡å—ç”µä½å™¨é˜ˆå€¼ä¸ºä½ */
+#define LED_ALARM P1_0                /* ºËĞÄ°å LED1£¬µÍµçÆ½µãÁÁ */
+#define MQ2_DO P0_5                   /* DO£º³¬Ä£¿éµçÎ»Æ÷ãĞÖµÎªµÍ */
 
-static u8  page_alarm = 0;            /* 1=ç«ç¾è­¦æŠ¥é¡µ */
-static u16 gas_avg = 0;               /* æ»‘åŠ¨å¹³å‡åçš„ ADC æµ“åº¦å€¼ */
+static u8  page_alarm = 0;            /* 1=»ğÔÖ¾¯±¨Ò³ */
+static u16 gas_avg = 0;               /* »¬¶¯Æ½¾ùºóµÄ ADC Å¨¶ÈÖµ */
 
-static void draw_time_row(void)       /* ä¸ TempNode ç›¸åŒå®ç° */
+static void draw_time_row(void)       /* Óë TempNode ÏàÍ¬ÊµÏÖ */
 {
     char b[17];
     rtc_fmt(b);
@@ -24,14 +24,14 @@ static void draw_time_row(void)       /* ä¸ TempNode ç›¸åŒå®ç° */
 static void draw_data_rows(void)
 {
     char b[6];
-    /* è¡Œ1ï¼ˆé¡µ2ï¼‰ï¼šæœ‰å®³æ°”ä½“:æ­£å¸¸/å¼‚å¸¸ï¼ˆæŒ‰ DO åˆ¤ï¼‰ */
+    /* ĞĞ1£¨Ò³2£©£ºÓĞº¦ÆøÌå:Õı³£/Òì³££¨°´ DO ÅĞ£© */
     LCD_P16x16Ch(0, 2, 3); LCD_P16x16Ch(16, 2, 4);
     LCD_P16x16Ch(32, 2, 5); LCD_P16x16Ch(48, 2, 6);
     b[0] = ':'; b[1] = '\0';
     LCD_P8x16Str(64, 2, (u8 *)b);
-    if(MQ2_DO == 0) { LCD_P16x16Ch(72, 2, 8); LCD_P16x16Ch(88, 2, 9); }   /* å¼‚å¸¸ */
-    else            { LCD_P16x16Ch(72, 2, 7); LCD_P16x16Ch(88, 2, 9); }   /* æ­£å¸¸ */
-    /* è¡Œ2ï¼ˆé¡µ4ï¼‰ï¼šADC:xxxxï¼ˆå¹³å‡åæµ“åº¦å€¼ï¼‰ */
+    if(MQ2_DO == 0) { LCD_P16x16Ch(72, 2, 8); LCD_P16x16Ch(88, 2, 9); }   /* Òì³£ */
+    else            { LCD_P16x16Ch(72, 2, 7); LCD_P16x16Ch(88, 2, 9); }   /* Õı³£ */
+    /* ĞĞ2£¨Ò³4£©£ºADC:xxxx£¨Æ½¾ùºóÅ¨¶ÈÖµ£© */
     b[0] = '0' + gas_avg / 1000;
     b[1] = '0' + gas_avg / 100 % 10;
     b[2] = '0' + gas_avg / 10 % 10;
@@ -39,14 +39,14 @@ static void draw_data_rows(void)
     b[4] = '\0';
     LCD_P8x16Str(0, 4, (u8 *)"ADC:");
     LCD_P8x16Str(32, 4, (u8 *)b);
-    /* è¡Œ3ï¼ˆé¡µ6ï¼‰ï¼šèŠ‚ç‚¹æ ‡è¯† */
+    /* ĞĞ3£¨Ò³6£©£º½Úµã±êÊ¶ */
     LCD_P8x16Str(40, 6, (u8 *)"NODE 3");
 }
 static void draw_alarm_page(void)
 {
     LCD_CLS();
     LCD_P16x16Ch(32, 3, 10); LCD_P16x16Ch(48, 3, 11);
-    LCD_P16x16Ch(64, 3, 12); LCD_P16x16Ch(80, 3, 13);   /* ç«ç¾è­¦æŠ¥ å±…ä¸­ */
+    LCD_P16x16Ch(64, 3, 12); LCD_P16x16Ch(80, 3, 13);   /* »ğÔÖ¾¯±¨ ¾ÓÖĞ */
     LCD_Invert(1);
 }
 static void draw_main_page(void)
@@ -56,7 +56,7 @@ static void draw_main_page(void)
     draw_time_row();
     draw_data_rows();
 }
-static void send_report(void)         /* ä¸ŠæŠ¥å¸§ [seq,adc_hi,adc_lo,do] 4B -> ä¸»èŠ‚ç‚¹ */
+static void send_report(void)         /* ÉÏ±¨Ö¡ [seq,adc_hi,adc_lo,do] 4B -> Ö÷½Úµã */
 {
     u8 d[4], buf[FRAME_MAX_LEN], n;
     static u8 seq = 0;
@@ -66,19 +66,19 @@ static void send_report(void)         /* ä¸ŠæŠ¥å¸§ [seq,adc_hi,adc_lo,do] 4B -> 
     n = frame_pack(buf, NODE_ID, 0x01, 0x01, d, 4);
     RF_Send(buf, n);
 }
-static void handle_rf(void)           /* ä¸ TempNode ç›¸åŒï¼š0x02 å¯¹æ—¶ã€0x03 æŠ¥è­¦é¡µåˆ‡æ¢ */
+static void handle_rf(void)           /* Óë TempNode ÏàÍ¬£º0x02 ¶ÔÊ±¡¢0x03 ±¨¾¯Ò³ÇĞ»» */
 {
     u8 src, dst, cmd, out[FRAME_MAX_LEN], n;
     if(!rf_rxLen) return;
     n = frame_parse((const u8 *)rf_rxBuf, rf_rxLen, &src, &dst, &cmd, out);
     rf_rxLen = 0;
     if(!n || (dst != NODE_ID && dst != 0xFF)) return;
-    if(cmd == 0x02 && n == 6)                 /* å¯¹æ—¶å¹¿æ’­ */
+    if(cmd == 0x02 && n == 6)                 /* ¶ÔÊ±¹ã²¥ */
     {
         rtc_set(out);
         if(!page_alarm) draw_time_row();
     }
-    else if(cmd == 0x03 && n == 2)            /* æŠ¥è­¦çŠ¶æ€å¹¿æ’­ */
+    else if(cmd == 0x03 && n == 2)            /* ±¨¾¯×´Ì¬¹ã²¥ */
     {
         if((out[0] & 0x01) && !page_alarm) { page_alarm = 1; draw_alarm_page(); }
         else if(!(out[0] & 0x01) && page_alarm) { page_alarm = 0; draw_main_page(); }
@@ -87,14 +87,14 @@ static void handle_rf(void)           /* ä¸ TempNode ç›¸åŒï¼š0x02 å¯¹æ—¶ã€0x0
 void main(void)
 {
     u32 last_1s = 0, last_2s = 0;
-    u8  last_min = 0xFF, warmup = 30;         /* ä¸Šç”µ 60s é¢„çƒ­æœŸï¼ˆ30 æ¬¡Ã—2sï¼‰ */
+    u8  last_min = 0xFF, warmup = 30;         /* ÉÏµç 60s Ô¤ÈÈÆÚ£¨30 ´Î¡Á2s£© */
     CLK_Init();
     T1_Init();
     RF_Init();
     P1SEL &= ~0x01; P1DIR |= 0x01; LED_ALARM = 1;
-    P0SEL &= ~0x20; P0DIR &= ~0x20;           /* P0.5 è¾“å…¥ï¼ˆMQ-2 DOï¼‰ */
+    P0SEL &= ~0x20; P0DIR &= ~0x20;           /* P0.5 ÊäÈë£¨MQ-2 DO£© */
     LCD_Init(); LCD_CLS();
-    LCD_P8x16Str(16, 4, (u8 *)"WARM UP 60s"); /* é¢„çƒ­æç¤ºï¼ˆASCIIï¼‰ */
+    LCD_P8x16Str(16, 4, (u8 *)"WARM UP 60s"); /* Ô¤ÈÈÌáÊ¾£¨ASCII£© */
     draw_time_row();
     while(1)
     {
@@ -102,7 +102,7 @@ void main(void)
         {
             last_1s += 1000;
             rtc_sec_tick();
-            if(page_alarm) LCD_Invert(g_rtc.sec & 1);   /* æŠ¥è­¦é¡µ 1Hz åæ˜¾é—ªçƒ */
+            if(page_alarm) LCD_Invert(g_rtc.sec & 1);   /* ±¨¾¯Ò³ 1Hz ·´ÏÔÉÁË¸ */
             else if(g_rtc.min != last_min && !warmup) { last_min = g_rtc.min; draw_time_row(); }
         }
         if(g_ms - last_2s >= 2000)
@@ -112,15 +112,15 @@ void main(void)
             if(warmup)
             {
                 warmup--;
-                if(!warmup && !page_alarm) { LCD_CLS(); draw_data_rows(); }   /* é¢„çƒ­ç»“æŸè¿›ä¸»é¡µé¢ */
+                if(!warmup && !page_alarm) { LCD_CLS(); draw_data_rows(); }   /* Ô¤ÈÈ½áÊø½øÖ÷Ò³Ãæ */
             }
             else
             {
-                send_report();              /* æ•°æ®åŒ…å³å¿ƒè·³ */
-                if(!page_alarm) draw_data_rows();   /* ADC å€¼æ¯ 2s åˆ·æ–° */
+                send_report();              /* Êı¾İ°ü¼´ĞÄÌø */
+                if(!page_alarm) draw_data_rows();   /* ADC ÖµÃ¿ 2s Ë¢ĞÂ */
             }
         }
         handle_rf();
-        LED_ALARM = (page_alarm && ((g_ms / 500) & 1)) ? 0 : 1;   /* 500ms ç¿»è½¬ */
+        LED_ALARM = (page_alarm && ((g_ms / 500) & 1)) ? 0 : 1;   /* 500ms ·­×ª */
     }
 }

@@ -1,15 +1,15 @@
-/* Master/csv.h â€” ä¸²å£ CSV æ¶ˆæ¯æ‰“åŒ…ï¼ˆä¸Šè¡Œï¼‰+ ä¸‹è¡ŒæŒ‡ä»¤è§£æ */
+/* Master/csv.h ¡ª ´®¿Ú CSV ÏûÏ¢´ò°ü£¨ÉÏĞĞ£©+ ÏÂĞĞÖ¸Áî½âÎö */
 #ifndef CSV_H
 #define CSV_H
 #include "timer.h"
-void csv_send_body(const char *body);      /* è‡ªåŠ¨è¡¥ *æ ¡éªŒ + \r\n å¹¶å‘é€ */
-void csv_send_data_th(u8 ti, u8 td, u8 hi, u8 hd);          /* D,2,â€¦ */
-void csv_send_data_gas(u16 adc, u8 do_hit);                 /* D,3,â€¦ */
+void csv_send_body(const char *body);      /* ×Ô¶¯²¹ *Ğ£Ñé + \r\n ²¢·¢ËÍ */
+void csv_send_data_th(u8 ti, u8 td, u8 hi, u8 hd);          /* D,2,¡­ */
+void csv_send_data_gas(u16 adc, u8 do_hit);                 /* D,3,¡­ */
 void csv_send_status(u8 node, u8 online);                   /* S,2,ONLINE */
 void csv_send_alarm(u8 on, u8 src);                         /* A,1,2 */
 void csv_send_loss(u8 node, u16 lost, u16 total);           /* L,2,3,128 */
 void csv_send_thresh(u16 t, u16 g);                         /* T,45,600 */
-/* ä¸‹è¡Œè§£æï¼šuart_line åŒ¹é… SET/TEST/TIMEï¼ŒæˆåŠŸè¿”å› 1ï¼ˆSETï¼‰/2ï¼ˆTESTï¼‰/3ï¼ˆTIMEï¼‰ï¼Œ
-   æœªçŸ¥è¡Œè¿”å› 0ï¼›æ— è®ºç»“æœå†…éƒ¨å‡å·² uart_line_consume */
+/* ÏÂĞĞ½âÎö£ºuart_line Æ¥Åä SET/TEST/TIME£¬³É¹¦·µ»Ø 1£¨SET£©/2£¨TEST£©/3£¨TIME£©£¬
+   Î´ÖªĞĞ·µ»Ø 0£»ÎŞÂÛ½á¹ûÄÚ²¿¾ùÒÑ uart_line_consume */
 u8   csv_handle_line(void);
 #endif

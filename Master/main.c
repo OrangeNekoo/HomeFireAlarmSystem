@@ -1,4 +1,4 @@
-/* Master/main.c â€” ä¸»èŠ‚ç‚¹ï¼ˆID=0x01ï¼‰ï¼šç•Œé¢/åˆ¤å†³/CSV ä¸ŠæŠ¥/ä¸‹è¡ŒæŒ‡ä»¤ */
+/* Master/main.c ¡ª Ö÷½Úµã£¨ID=0x01£©£º½çÃæ/ÅĞ¾ö/CSV ÉÏ±¨/ÏÂĞĞÖ¸Áî */
 #include <ioCC2530.h>
 #include "..\Common\clk.h"
 #include "..\Common\timer.h"
@@ -10,15 +10,15 @@
 #include "..\Common\uart.h"
 #include "csv.h"
 #define NODE_ID 0x01
-#define LED_ALARM P0_5                   /* ä½ç”µå¹³ç‚¹äº® */
+#define LED_ALARM P0_5                   /* µÍµçÆ½µãÁÁ */
 
 typedef struct {
     u8  online;
     u32 last_ms;
     u8  last_seq;
     u16 loss, total;
-    u8  temp_i, temp_d, hum_i, hum_d;    /* èŠ‚ç‚¹ 2 ç”¨ */
-    u16 gas;  u8  gas_do;                /* èŠ‚ç‚¹ 3 ç”¨ */
+    u8  temp_i, temp_d, hum_i, hum_d;    /* ½Úµã 2 ÓÃ */
+    u16 gas;  u8  gas_do;                /* ½Úµã 3 ÓÃ */
 } node_info_t;
 
 node_info_t n2, n3;
@@ -30,32 +30,32 @@ static void draw_main_page(void)
     char b[17];
     LCD_CLS(); LCD_Invert(0);
     rtc_fmt(b); LCD_P8x16Str(0, 0, (u8 *)b);
-    /* æ¸©åº¦è¡Œï¼šæ¸©åº¦:xx.xâ„ƒ */
+    /* ÎÂ¶ÈĞĞ£ºÎÂ¶È:xx.x¡æ */
     LCD_P16x16Ch(0, 2, 0); LCD_P16x16Ch(16, 2, 2);
     b[0]=':'; b[1]='0'+n2.temp_i/10; b[2]='0'+n2.temp_i%10;
     b[3]='.'; b[4]='0'+n2.temp_d; b[5]='\0';
     LCD_P8x16Str(32, 2, (u8 *)b); LCD_P16x16Ch(72, 2, 16);
-    /* æ¹¿åº¦è¡Œï¼šæ¹¿åº¦:xx.x% */
+    /* Êª¶ÈĞĞ£ºÊª¶È:xx.x% */
     LCD_P16x16Ch(0, 4, 1); LCD_P16x16Ch(16, 4, 2);
     b[0]=':'; b[1]='0'+n2.hum_i/10; b[2]='0'+n2.hum_i%10;
     b[3]='.'; b[4]='0'+n2.hum_d; b[5]='%'; b[6]='\0';
     LCD_P8x16Str(32, 4, (u8 *)b);
-    /* æœ‰å®³æ°”ä½“è¡Œï¼šæ­£å¸¸/å¼‚å¸¸/ç¦»çº¿ï¼ˆgas_do=1 ä¸ºè¶…é˜ˆå¼‚å¸¸ï¼Œä¸ GasNode d[3] è¯­ä¹‰ä¸€è‡´ï¼‰ */
+    /* ÓĞº¦ÆøÌåĞĞ£ºÕı³£/Òì³£/ÀëÏß£¨gas_do=1 Îª³¬ãĞÒì³££¬Óë GasNode d[3] ÓïÒåÒ»ÖÂ£© */
     LCD_P16x16Ch(0, 6, 3); LCD_P16x16Ch(16, 6, 4);
     LCD_P16x16Ch(32, 6, 5); LCD_P16x16Ch(48, 6, 6);
     LCD_P8x16Str(64, 6, (u8 *)":");
-    if(!n3.online)      { LCD_P16x16Ch(72, 6, 14); LCD_P16x16Ch(88, 6, 15); }  /* ç¦»çº¿ */
-    else if(n3.gas_do)  { LCD_P16x16Ch(72, 6, 8);  LCD_P16x16Ch(88, 6, 9);  }  /* å¼‚å¸¸ */
-    else                { LCD_P16x16Ch(72, 6, 7);  LCD_P16x16Ch(88, 6, 9);  }  /* æ­£å¸¸ */
+    if(!n3.online)      { LCD_P16x16Ch(72, 6, 14); LCD_P16x16Ch(88, 6, 15); }  /* ÀëÏß */
+    else if(n3.gas_do)  { LCD_P16x16Ch(72, 6, 8);  LCD_P16x16Ch(88, 6, 9);  }  /* Òì³£ */
+    else                { LCD_P16x16Ch(72, 6, 7);  LCD_P16x16Ch(88, 6, 9);  }  /* Õı³£ */
 }
 static void draw_alarm_page(void)
 {
     LCD_CLS();
     LCD_P16x16Ch(32, 3, 10); LCD_P16x16Ch(48, 3, 11);
-    LCD_P16x16Ch(64, 3, 12); LCD_P16x16Ch(80, 3, 13);   /* ç«ç¾è­¦æŠ¥ å±…ä¸­ */
+    LCD_P16x16Ch(64, 3, 12); LCD_P16x16Ch(80, 3, 13);   /* »ğÔÖ¾¯±¨ ¾ÓÖĞ */
     LCD_Invert(1);
 }
-static void broadcast_time(void)          /* å¹¿æ’­å¯¹æ—¶ï¼šcmd 0x02ã€dst 0xFFã€åŸŸ [å¹´-2000,æœˆ,æ—¥,æ—¶,åˆ†,ç§’] */
+static void broadcast_time(void)          /* ¹ã²¥¶ÔÊ±£ºcmd 0x02¡¢dst 0xFF¡¢Óò [Äê-2000,ÔÂ,ÈÕ,Ê±,·Ö,Ãë] */
 {
     u8 d[6], buf[FRAME_MAX_LEN], n;
     d[0] = g_rtc.year; d[1] = g_rtc.mon; d[2] = g_rtc.day;
@@ -63,7 +63,7 @@ static void broadcast_time(void)          /* å¹¿æ’­å¯¹æ—¶ï¼šcmd 0x02ã€dst 0xFFã
     n = frame_pack(buf, NODE_ID, 0xFF, 0x02, d, 6);
     RF_Send(buf, n);
 }
-static void set_alarm(u8 on, u8 src)      /* é¡µé¢åˆ‡æ¢ + RF å¹¿æ’­ + ä¸²å£ä¸ŠæŠ¥ ä¸‰è”åŠ¨ */
+static void set_alarm(u8 on, u8 src)      /* Ò³ÃæÇĞ»» + RF ¹ã²¥ + ´®¿ÚÉÏ±¨ ÈıÁª¶¯ */
 {
     u8 d[2], buf[FRAME_MAX_LEN], n;
     alarm_on = on; alarm_src = src;
@@ -74,7 +74,7 @@ static void set_alarm(u8 on, u8 src)      /* é¡µé¢åˆ‡æ¢ + RF å¹¿æ’­ + ä¸²å£ä¸
     RF_Send(buf, n);
     csv_send_alarm(on, src);
 }
-static void judge_alarm(void)             /* 500ms è°ƒä¸€æ¬¡ï¼›å›å·® 5% é˜²æŠ– */
+static void judge_alarm(void)             /* 500ms µ÷Ò»´Î£»»Ø²î 5% ·À¶¶ */
 {
     if(alarm_on)
     {
@@ -91,7 +91,7 @@ static void judge_alarm(void)             /* 500ms è°ƒä¸€æ¬¡ï¼›å›å·® 5% é˜²æŠ– 
         else if(test_on)                          set_alarm(1, 3);
     }
 }
-static void handle_rf(void)               /* åºå·è¿ç»­æ€§ç»Ÿè®¡ä¸¢åŒ… */
+static void handle_rf(void)               /* ĞòºÅÁ¬ĞøĞÔÍ³¼Æ¶ª°ü */
 {
     u8 src, dst, cmd, out[FRAME_MAX_LEN], n, diff;
     if(!rf_rxLen) return;
@@ -108,7 +108,7 @@ static void handle_rf(void)               /* åºå·è¿ç»­æ€§ç»Ÿè®¡ä¸¢åŒ… */
         if(!n2.online) { n2.online = 1; csv_send_status(2, 1); csv_send_loss(2, n2.loss, n2.total); }
         n2.last_ms = g_ms;
         csv_send_data_th(n2.temp_i, n2.temp_d, n2.hum_i, n2.hum_d);
-        if(!alarm_on) draw_main_page();       /* æ•°å€¼è¡Œåˆ·æ–°ï¼ˆç®€åŒ–ä¸ºæ•´é¡µé‡ç”»ï¼ŒOLED æ— å¯æ„Ÿé—ªçƒï¼‰ */
+        if(!alarm_on) draw_main_page();       /* ÊıÖµĞĞË¢ĞÂ£¨¼ò»¯ÎªÕûÒ³ÖØ»­£¬OLED ÎŞ¿É¸ĞÉÁË¸£© */
     }
     else if(cmd == 0x01 && src == 0x03 && n == 4)
     {
@@ -123,7 +123,7 @@ static void handle_rf(void)               /* åºå·è¿ç»­æ€§ç»Ÿè®¡ä¸¢åŒ… */
         if(!alarm_on) draw_main_page();
     }
 }
-static void check_offline(void)              /* 1s è°ƒä¸€æ¬¡ï¼›10s æ— å¿ƒè·³åˆ¤ç¦»çº¿ */
+static void check_offline(void)              /* 1s µ÷Ò»´Î£»10s ÎŞĞÄÌøÅĞÀëÏß */
 {
     if(n2.online && g_ms - n2.last_ms > 10000)
     { n2.online = 0; csv_send_status(2, 0); csv_send_loss(2, n2.loss, n2.total); if(!alarm_on) draw_main_page(); }
@@ -141,13 +141,13 @@ void main(void)
     P0SEL &= ~0x20; P0DIR |= 0x20; LED_ALARM = 1;
     LCD_Init(); LCD_CLS();
     draw_main_page();
-    csv_send_thresh(th_temp, th_gas);        /* ä¸Šçº¿å‘ŠçŸ¥ä¸Šä½æœºå½“å‰é˜ˆå€¼ */
+    csv_send_thresh(th_temp, th_gas);        /* ÉÏÏß¸æÖªÉÏÎ»»úµ±Ç°ãĞÖµ */
     while(1)
     {
         if(uart_line_ready)
         {
             u8 r = csv_handle_line();
-            if(r == 2) judge_alarm();         /* TEST ç½®ä½/å¤ä½åç«‹å³åˆ¤å†³ */
+            if(r == 2) judge_alarm();         /* TEST ÖÃÎ»/¸´Î»ºóÁ¢¼´ÅĞ¾ö */
             else if(r == 3) { broadcast_time(); if(!alarm_on) draw_main_page(); }
         }
         handle_rf();
@@ -157,10 +157,10 @@ void main(void)
             last_1s += 1000;
             rtc_sec_tick();
             check_offline();
-            if(alarm_on) LCD_Invert(g_rtc.sec & 1);      /* æŠ¥è­¦ 1Hz é—ªçƒ */
+            if(alarm_on) LCD_Invert(g_rtc.sec & 1);      /* ±¨¾¯ 1Hz ÉÁË¸ */
             else if(g_rtc.min != last_min) { last_min = g_rtc.min; draw_main_page(); }
         }
         if(g_ms - last_60s >= 60000) { last_60s += 60000; broadcast_time(); }
-        LED_ALARM = (alarm_on && ((g_ms / 500) & 1)) ? 0 : 1;   /* 500ms ç¿»è½¬ */
+        LED_ALARM = (alarm_on && ((g_ms / 500) & 1)) ? 0 : 1;   /* 500ms ·­×ª */
     }
 }

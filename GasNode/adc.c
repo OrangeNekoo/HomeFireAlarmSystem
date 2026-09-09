@@ -4,11 +4,11 @@
 u16 ADC_Read6(void)
 {
     u16 v;
-    ADCCFG |= 0x40;               /* P0.6 ADC 输入使能 */
-    ADCCON3 = 0xB6;               /* 参考 AVDD5(3.3V)、64 分频 12 位、通道 AIN6 */
-    while(!(ADCCON1 & 0x80));     /* 等待 EOC */
-    v = ADCL >> 4;                /* 先读 ADCL（低 8 位取高 4 位） */
-    v |= ((u16)ADCH) << 4;        /* 再读 ADCH，拼装 12 位结果 0~4095 */
+    ADCCFG |= 0x40;               /* P0.6 ADC ����ʹ�� */
+    ADCCON3 = 0xB6;               /* �ο� AVDD5(3.3V)��64 ��Ƶ 12 λ��ͨ�� AIN6 */
+    while(!(ADCCON1 & 0x80));     /* �ȴ� EOC */
+    v = ADCL >> 4;                /* �ȶ� ADCL���� 8 λȡ�� 4 λ�� */
+    v |= ((u16)ADCH) << 4;        /* �ٶ� ADCH��ƴװ 12 λ��� 0~4095 */
     return v;
 }
 u16 ADC_Avg6(u16 v)

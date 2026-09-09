@@ -1,10 +1,10 @@
-/* Common/font16.h â€” å­—åº“æ¥å£ */
+/* Common/font16.h ¡ª ×Ö¿â½Ó¿Ú */
 #ifndef FONT16_H
 #define FONT16_H
-extern const unsigned char F16x16[];   /* 17 ä¸ª 16x16 æ±‰å­—ï¼Œæ¯å­— 32 å­—èŠ‚ */
-extern const unsigned char F6x8[][6];  /* ASCII 6x8ï¼Œèµ·å§‹äºç©ºæ ¼ 0x20 */
-extern const unsigned char F8X16[];    /* ASCII 8x16ï¼Œèµ·å§‹äºç©ºæ ¼ 0x20 */
-/* æ±‰å­—ç´¢å¼•ï¼ˆä¸ font matrix.txt ä¸€è‡´ï¼‰ï¼š
-   0æ¸© 1æ¹¿ 2åº¦ 3æœ‰ 4å®³ 5æ°” 6ä½“ 7æ­£ 8å¼‚ 9å¸¸
-   10ç« 11ç¾ 12è­¦ 13æŠ¥ 14ç¦» 15çº¿ 16â„ƒ */
+extern const unsigned char F16x16[];   /* 17 ¸ö 16x16 ºº×Ö£¬Ã¿×Ö 32 ×Ö½Ú */
+extern const unsigned char F6x8[][6];  /* ASCII 6x8£¬ÆğÊ¼ÓÚ¿Õ¸ñ 0x20 */
+extern const unsigned char F8X16[];    /* ASCII 8x16£¬ÆğÊ¼ÓÚ¿Õ¸ñ 0x20 */
+/* ºº×ÖË÷Òı£¨Óë font matrix.txt Ò»ÖÂ£©£º
+   0ÎÂ 1Êª 2¶È 3ÓĞ 4º¦ 5Æø 6Ìå 7Õı 8Òì 9³£
+   10»ğ 11ÔÖ 12¾¯ 13±¨ 14Àë 15Ïß 16¡æ */
 #endif

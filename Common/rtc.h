@@ -2,9 +2,9 @@
 #ifndef RTC_H
 #define RTC_H
 #include "timer.h"
-typedef struct { u8 year, mon, day, hour, min, sec; } rtc_t;   /* year = å…¬å†å¹´-2000 */
+typedef struct { u8 year, mon, day, hour, min, sec; } rtc_t;   /* year = ¹«ÀúÄê-2000 */
 extern rtc_t g_rtc;
-void rtc_set(const u8 *ymdhms);   /* ç”¨ 6 å­—èŠ‚æ•°ç»„ï¼ˆå¹´-2000,æœˆ,æ—¥,æ—¶,åˆ†,ç§’ï¼‰è®¾ç½® */
-void rtc_sec_tick(void);          /* æ¯ç§’è°ƒç”¨ä¸€æ¬¡ï¼Œèµ°æ—¶è¿›ä½ */
-void rtc_fmt(char *buf);          /* æ ¼å¼åŒ–ä¸º "2026:09:08 16:30"ï¼ˆ17 å­—èŠ‚å« \0ï¼‰ */
+void rtc_set(const u8 *ymdhms);   /* ÓÃ 6 ×Ö½ÚÊı×é£¨Äê-2000,ÔÂ,ÈÕ,Ê±,·Ö,Ãë£©ÉèÖÃ */
+void rtc_sec_tick(void);          /* Ã¿Ãëµ÷ÓÃÒ»´Î£¬×ßÊ±½øÎ» */
+void rtc_fmt(char *buf);          /* ¸ñÊ½»¯Îª "2026:09:08 16:30"£¨17 ×Ö½Úº¬ \0£© */
 #endif

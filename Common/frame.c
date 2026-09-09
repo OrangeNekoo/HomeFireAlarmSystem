@@ -31,7 +31,7 @@ u8 frame_selftest(u8 *buf)
     if(n != 12) return 0;
     if(frame_parse(buf, n, &s, &d2, &c, out) != 5) return 0;
     if(s != 0x02 || d2 != 0x01 || c != 0x01 || out[0] != 10 || out[1] != 25) return 0;
-    buf[3] ^= 0xFF;                              /* ç ´åæ ¡éªŒå’Œ */
+    buf[3] ^= 0xFF;                              /* ÆÆ»µĞ£ÑéºÍ */
     if(frame_parse(buf, n, &s, &d2, &c, out) != 0) return 0;
     return 1;
 }

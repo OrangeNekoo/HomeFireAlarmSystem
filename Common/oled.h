@@ -1,15 +1,15 @@
-/* Common/oled.h â€” SSD1306 0.96å¯¸ 128x64 I2C é©±åŠ¨æ¥å£ */
+/* Common/oled.h ¡ª SSD1306 0.96´ç 128x64 I2C Çı¶¯½Ó¿Ú */
 #ifndef OLED_H
 #define OLED_H
 
-void LCD_Init(void);                                        /* åˆå§‹åŒ–ï¼ˆå«æ¸…å±ï¼‰ */
-void LCD_CLS(void);                                         /* å…¨å±æ¸…é›¶ */
-void LCD_WrCmd(unsigned char cmd);                          /* å†™å‘½ä»¤ */
-void LCD_WrDat(unsigned char dat);                          /* å†™æ•°æ® */
-void LCD_Set_Pos(unsigned char x, unsigned char y);         /* è®¾ç½®åæ ‡ï¼ˆxåˆ—0~127ï¼Œyé¡µ0~7ï¼‰ */
-void LCD_P6x8Str(unsigned char x, unsigned char y, unsigned char ch[]);   /* 6x8 ASCII å­—ç¬¦ä¸² */
-void LCD_P8x16Str(unsigned char x, unsigned char y, unsigned char ch[]);  /* 8x16 ASCII å­—ç¬¦ä¸² */
-void LCD_P16x16Ch(unsigned char x, unsigned char y, unsigned char N);     /* 16x16 æ±‰å­—ï¼ŒN=å­—åº“ç´¢å¼• */
-void LCD_Invert(unsigned char on);                          /* åæ˜¾å¼€å…³ï¼ˆ1=åæ˜¾ 0=æ­£å¸¸ï¼‰ */
+void LCD_Init(void);                                        /* ³õÊ¼»¯£¨º¬ÇåÆÁ£© */
+void LCD_CLS(void);                                         /* È«ÆÁÇåÁã */
+void LCD_WrCmd(unsigned char cmd);                          /* Ğ´ÃüÁî */
+void LCD_WrDat(unsigned char dat);                          /* Ğ´Êı¾İ */
+void LCD_Set_Pos(unsigned char x, unsigned char y);         /* ÉèÖÃ×ø±ê£¨xÁĞ0~127£¬yÒ³0~7£© */
+void LCD_P6x8Str(unsigned char x, unsigned char y, unsigned char ch[]);   /* 6x8 ASCII ×Ö·û´® */
+void LCD_P8x16Str(unsigned char x, unsigned char y, unsigned char ch[]);  /* 8x16 ASCII ×Ö·û´® */
+void LCD_P16x16Ch(unsigned char x, unsigned char y, unsigned char N);     /* 16x16 ºº×Ö£¬N=×Ö¿âË÷Òı */
+void LCD_Invert(unsigned char on);                          /* ·´ÏÔ¿ª¹Ø£¨1=·´ÏÔ 0=Õı³££© */
 
 #endif /* OLED_H */

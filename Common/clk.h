@@ -1,5 +1,5 @@
 /* Common/clk.h */
 #ifndef CLK_H
 #define CLK_H
-void CLK_Init(void);          /* ç³»ç»Ÿæ—¶é’Ÿåˆ‡æ¢ä¸º 32MHz æ™¶æŒ¯ */
+void CLK_Init(void);          /* ÏµÍ³Ê±ÖÓÇĞ»»Îª 32MHz ¾§Õñ */
 #endif

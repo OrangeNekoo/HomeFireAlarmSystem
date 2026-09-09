@@ -3,10 +3,10 @@
 #define UART_H
 #include "timer.h"
 #define UART_RX_BUF 64
-extern volatile u8  uart_line[UART_RX_BUF];  /* å®Œæ•´ä¸€è¡Œï¼ˆä¸å« \r\nï¼Œ\0 ç»“å°¾ï¼‰ */
-extern volatile u8  uart_line_ready;         /* 1=æœ‰æœªå¤„ç†è¡Œ */
+extern volatile u8  uart_line[UART_RX_BUF];  /* ÍêÕûÒ»ĞĞ£¨²»º¬ \r\n£¬\0 ½áÎ²£© */
+extern volatile u8  uart_line_ready;         /* 1=ÓĞÎ´´¦ÀíĞĞ */
 void UART_Init(void);
 void UART_SendStr(const char *s);
 void UART_SendBytes(const u8 *s, u8 len);
-void uart_line_consume(void);                /* ä¸»å¾ªç¯å¤„ç†å®Œä¸€è¡Œåè°ƒç”¨ */
+void uart_line_consume(void);                /* Ö÷Ñ­»·´¦ÀíÍêÒ»ĞĞºóµ÷ÓÃ */
 #endif

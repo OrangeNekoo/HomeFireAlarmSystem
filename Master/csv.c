@@ -1,14 +1,14 @@
-/* Master/csv.c â€” ä¸²å£ CSV æ‰“åŒ…/è§£æã€‚ASCII æ•°å­—æ‰‹å†™è½¬æ¢ï¼Œä¸ç”¨ sprintfï¼ˆ8051 èµ„æºç´§å¼ ï¼‰ */
+/* Master/csv.c ¡ª ´®¿Ú CSV ´ò°ü/½âÎö¡£ASCII Êı×ÖÊÖĞ´×ª»»£¬²»ÓÃ sprintf£¨8051 ×ÊÔ´½ôÕÅ£© */
 #include <ioCC2530.h>
 #include <string.h>
 #include "csv.h"
 #include "..\Common\uart.h"
 #include "..\Common\rtc.h"
-extern u16 th_temp, th_gas;               /* å®šä¹‰åœ¨ main.c */
+extern u16 th_temp, th_gas;               /* ¶¨ÒåÔÚ main.c */
 extern u8  test_on;
 
 static const char hex_tab[] = "0123456789ABCDEF";
-static u8 u16_to_str(u16 v, char *b)      /* è¿”å›ä½æ•° */
+static u8 u16_to_str(u16 v, char *b)      /* ·µ»ØÎ»Êı */
 {
     char t[5]; u8 n = 0, i = 0;
     do { t[n++] = '0' + v % 10; v /= 10; } while(v);
@@ -79,11 +79,11 @@ void csv_send_thresh(u16 t, u16 g)
     b[i] = '\0';
     csv_send_body(b);
 }
-/* â€”â€” ä¸‹è¡Œè§£æ â€”â€”
-   æ¸¸æ ‡çº¦å®šï¼šskip_to(s,n) ä»è¡Œé¦–è·³è¿‡ n ä¸ªé€—å·ï¼ŒæŒ‡å‘ç¬¬ n+1 ä¸ªå­—æ®µé¦–å­—ç¬¦ï¼›
-   parse_u16 ä»å½“å‰æ¸¸æ ‡è¿ç»­è¯»æ•°å­—å¹¶å‰ç§»æ¸¸æ ‡ã€‚SET/TIME æ¯ä¸ªå­—æ®µéƒ½ä»è¡Œé¦–
-   é‡æ–°å®šä½ï¼ˆskip_to(s, å­—æ®µåºå·)ï¼‰ï¼Œä¸"ä»è¡Œé¦–æŒ‰é€—å·å–ç¬¬ n ä¸ªå­—æ®µ"æ„å›¾ä¸€è‡´ */
-static const char *skip_to(const char *s, u8 n)   /* è·³è¿‡ n ä¸ªé€—å· */
+/* ¡ª¡ª ÏÂĞĞ½âÎö ¡ª¡ª
+   ÓÎ±êÔ¼¶¨£ºskip_to(s,n) ´ÓĞĞÊ×Ìø¹ı n ¸ö¶ººÅ£¬Ö¸ÏòµÚ n+1 ¸ö×Ö¶ÎÊ××Ö·û£»
+   parse_u16 ´Óµ±Ç°ÓÎ±êÁ¬Ğø¶ÁÊı×Ö²¢Ç°ÒÆÓÎ±ê¡£SET/TIME Ã¿¸ö×Ö¶Î¶¼´ÓĞĞÊ×
+   ÖØĞÂ¶¨Î»£¨skip_to(s, ×Ö¶ÎĞòºÅ)£©£¬Óë"´ÓĞĞÊ×°´¶ººÅÈ¡µÚ n ¸ö×Ö¶Î"ÒâÍ¼Ò»ÖÂ */
+static const char *skip_to(const char *s, u8 n)   /* Ìø¹ı n ¸ö¶ººÅ */
 {
     while(n && *s) { if(*s++ == ',') n--; }
     return s;
@@ -111,7 +111,7 @@ u8 csv_handle_line(void)
         const char *p = skip_to(s, 1);
         test_on = (parse_u16(&p) == 1);
         uart_line_consume();
-        return 2;                             /* main.c æ®æ­¤è§¦å‘/è§£é™¤æ¨¡æ‹ŸæŠ¥è­¦ */
+        return 2;                             /* main.c ¾İ´Ë´¥·¢/½â³ıÄ£Äâ±¨¾¯ */
     }
     if(!strncmp(s, "TIME,", 5))
     {
@@ -120,7 +120,7 @@ u8 csv_handle_line(void)
         for(i = 0; i < 6; i++) { t[i] = (u8)parse_u16(&p); p = skip_to(s, i + 2); }
         rtc_set(t);
         uart_line_consume();
-        return 3;                             /* main.c æ®æ­¤ç«‹å³å¹¿æ’­å¯¹æ—¶ */
+        return 3;                             /* main.c ¾İ´ËÁ¢¼´¹ã²¥¶ÔÊ± */
     }
     uart_line_consume();
     return 0;

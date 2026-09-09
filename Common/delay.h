@@ -2,6 +2,6 @@
 #ifndef DELAY_H
 #define DELAY_H
 #include "timer.h"
-void Delay_ms(u16 ms);            /* å¿™ç­‰æ¯«ç§’ï¼ˆä¸ä¾èµ–ä¸­æ–­ï¼Œå¯åœ¨ EA=0 åŒºä½¿ç”¨ï¼‰ */
-void Delay_us(u16 us);            /* å¿™ç­‰å¾®ç§’ï¼ˆ32MHz ä¸‹è¿‘ä¼¼å€¼ï¼ŒDHT11 æ—¶åºç”¨ï¼‰ */
+void Delay_ms(u16 ms);            /* Ã¦µÈºÁÃë£¨²»ÒÀÀµÖĞ¶Ï£¬¿ÉÔÚ EA=0 ÇøÊ¹ÓÃ£© */
+void Delay_us(u16 us);            /* Ã¦µÈÎ¢Ãë£¨32MHz ÏÂ½üËÆÖµ£¬DHT11 Ê±ĞòÓÃ£© */
 #endif

@@ -5,6 +5,6 @@
 typedef unsigned char  u8;
 typedef unsigned int   u16;
 typedef unsigned long  u32;
-extern volatile u32 g_ms;      /* ä¸Šç”µä»¥æ¥æ¯«ç§’æ•°ï¼ˆçº¦ 49.7 å¤©å›ç»•ï¼Œè¯¾è®¾æ— ç¢ï¼‰ */
+extern volatile u32 g_ms;      /* ÉÏµçÒÔÀ´ºÁÃëÊı£¨Ô¼ 49.7 Ìì»ØÈÆ£¬¿ÎÉèÎŞ°­£© */
 void T1_Init(void);
 #endif
