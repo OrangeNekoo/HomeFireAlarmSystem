@@ -7,19 +7,23 @@
     <name>Debug</name>
     <outputs>
       <file>$PROJ_DIR$\main.c</file>
-      <file>$PROJ_DIR$\..\Common\timer.c</file>
-      <file>$PROJ_DIR$\..\Common\font16.c</file>
       <file>$PROJ_DIR$\..\Common\delay.c</file>
-      <file>$PROJ_DIR$\..\Common\clk.c</file>
-      <file>$PROJ_DIR$\..\Common\oled.c</file>
-      <file>$TOOLKIT_DIR$\config\devices\Texas Instruments\lnk51ew_cc2530F256.xcl</file>
       <file>$PROJ_DIR$\Debug\Obj\clk.r51</file>
       <file>$PROJ_DIR$\Debug\Obj\delay.r51</file>
       <file>$PROJ_DIR$\Debug\Exe\TempNode.d51</file>
       <file>$PROJ_DIR$\Debug\Obj\oled.r51</file>
       <file>$TOOLKIT_DIR$\lib\clib\cl-pli-nlpd-1e16x01.r51</file>
       <file>$PROJ_DIR$\Debug\Obj\font16.r51</file>
+      <file>$PROJ_DIR$\..\Common\timer.c</file>
+      <file>$PROJ_DIR$\..\Common\oled.c</file>
+      <file>$PROJ_DIR$\..\Common\clk.c</file>
+      <file>$PROJ_DIR$\..\Common\font16.c</file>
+      <file>$TOOLKIT_DIR$\config\devices\Texas Instruments\lnk51ew_cc2530F256.xcl</file>
+      <file>$TOOLKIT_DIR$\inc\clib\stdbool.h</file>
+      <file>$TOOLKIT_DIR$\inc\intrinsics.h</file>
       <file>$PROJ_DIR$\Debug\Obj\main.r51</file>
+      <file>$PROJ_DIR$\..\Common\timer.h</file>
+      <file>$PROJ_DIR$\..\Common\delay.h</file>
       <file>$TOOLKIT_DIR$\inc\ioCC2530.h</file>
       <file>$PROJ_DIR$\Debug\Obj\timer.r51</file>
     </outputs>
@@ -28,7 +32,7 @@
       <outputs>
         <tool>
           <name>XLINK</name>
-          <file> 9</file>
+          <file> 4</file>
         </tool>
       </outputs>
     </file>
@@ -37,13 +41,37 @@
       <outputs>
         <tool>
           <name>ICC8051</name>
-          <file> 13</file>
+          <file> 15</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
           <name>ICC8051</name>
-          <file> 14</file>
+          <file> 18</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\Common\delay.c</name>
+      <outputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 3</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 18 14 13 17 16</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Debug\Exe\TempNode.d51</name>
+      <inputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 12 2 3 7 15 5 19 6</file>
         </tool>
       </inputs>
     </file>
@@ -52,25 +80,22 @@
       <outputs>
         <tool>
           <name>ICC8051</name>
-          <file> 15</file>
+          <file> 19</file>
         </tool>
       </outputs>
+      <inputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 18 16</file>
+        </tool>
+      </inputs>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\Common\font16.c</name>
+      <name>$PROJ_DIR$\..\Common\oled.c</name>
       <outputs>
         <tool>
           <name>ICC8051</name>
-          <file> 12</file>
-        </tool>
-      </outputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\Common\delay.c</name>
-      <outputs>
-        <tool>
-          <name>ICC8051</name>
-          <file> 8</file>
+          <file> 5</file>
         </tool>
       </outputs>
     </file>
@@ -79,27 +104,24 @@
       <outputs>
         <tool>
           <name>ICC8051</name>
-          <file> 7</file>
+          <file> 2</file>
         </tool>
       </outputs>
+      <inputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 18</file>
+        </tool>
+      </inputs>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\Common\oled.c</name>
+      <name>$PROJ_DIR$\..\Common\font16.c</name>
       <outputs>
         <tool>
           <name>ICC8051</name>
-          <file> 10</file>
+          <file> 7</file>
         </tool>
       </outputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\Debug\Exe\TempNode.d51</name>
-      <inputs>
-        <tool>
-          <name>XLINK</name>
-          <file> 6 7 8 12 13 10 15 11</file>
-        </tool>
-      </inputs>
     </file>
   </configuration>
   <configuration>
