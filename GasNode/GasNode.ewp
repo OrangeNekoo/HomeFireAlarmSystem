@@ -694,7 +694,7 @@
         </option>
         <option>
           <name>OutputFile</name>
-          <state>HomeFireAlarmSystem.d51</state>
+          <state>GasNode.d51</state>
         </option>
         <option>
           <name>OutputFormat</name>
@@ -896,7 +896,7 @@
         </option>
         <option>
           <name>ExtraOutputFile</name>
-          <state>HomeFireAlarmSystem.sim</state>
+          <state>GasNode.sim</state>
         </option>
         <option>
           <name>ExtraOutputFormat</name>

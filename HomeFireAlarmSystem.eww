@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
-
 <workspace>
   <project>
-    <path>$WS_DIR$\HomeFireAlarmSystem.ewp</path>
+    <path>$WS_DIR$\Master\Master.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\TempNode\TempNode.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\GasNode\GasNode.ewp</path>
   </project>
   <batchBuild/>
 </workspace>
-
-

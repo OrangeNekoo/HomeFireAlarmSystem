@@ -2,18 +2,29 @@
 
 <project>
   <fileVersion>2</fileVersion>
-  <fileChecksum>32175757</fileChecksum>
+  <fileChecksum>133778566</fileChecksum>
   <configuration>
     <name>Debug</name>
     <outputs>
-      <file>$PROJ_DIR$\main.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\timer.r51</file>
+      <file>$PROJ_DIR$\Debug\Obj\delay.r51</file>
+      <file>$PROJ_DIR$\Debug\Obj\clk.r51</file>
+      <file>$PROJ_DIR$\Debug\Obj\oled.r51</file>
+      <file>$PROJ_DIR$\Debug\Exe\Master.d51</file>
+      <file>$PROJ_DIR$\Debug\Obj\font16.r51</file>
+      <file>$TOOLKIT_DIR$\inc\ioCC2530.h</file>
+      <file>$TOOLKIT_DIR$\config\devices\Texas Instruments\lnk51ew_cc2530F256.xcl</file>
+      <file>$PROJ_DIR$\..\Common\font16.c</file>
       <file>$PROJ_DIR$\Debug\Obj\HomeFireAlarmSystem.pbd</file>
       <file>$PROJ_DIR$\Debug\Obj\main.r51</file>
       <file>$PROJ_DIR$\Debug\Obj\main.pbi</file>
       <file>$PROJ_DIR$\Debug\Exe\HomeFireAlarmSystem.d51</file>
-      <file>$TOOLKIT_DIR$\inc\ioCC2530.h</file>
-      <file>$TOOLKIT_DIR$\config\devices\Texas Instruments\lnk51ew_cc2530F256.xcl</file>
       <file>$TOOLKIT_DIR$\lib\clib\cl-pli-nlpd-1e16x01.r51</file>
+      <file>$PROJ_DIR$\main.c</file>
+      <file>$PROJ_DIR$\..\Common\clk.c</file>
+      <file>$PROJ_DIR$\..\Common\timer.c</file>
+      <file>$PROJ_DIR$\..\Common\oled.c</file>
+      <file>$PROJ_DIR$\..\Common\delay.c</file>
     </outputs>
     <file>
       <name>[ROOT_NODE]</name>
@@ -25,34 +36,29 @@
       </outputs>
     </file>
     <file>
-      <name>$PROJ_DIR$\main.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 3</file>
-        </tool>
-        <tool>
-          <name>ICC8051</name>
-          <file> 2</file>
-        </tool>
-      </outputs>
+      <name>$PROJ_DIR$\Debug\Exe\Master.d51</name>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 5</file>
+          <name>XLINK</name>
+          <file> 7 2 1 5 10 3 0 13</file>
         </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\Common\font16.c</name>
+      <outputs>
         <tool>
           <name>ICC8051</name>
           <file> 5</file>
         </tool>
-      </inputs>
+      </outputs>
     </file>
     <file>
       <name>$PROJ_DIR$\Debug\Obj\HomeFireAlarmSystem.pbd</name>
       <inputs>
         <tool>
           <name>BILINK</name>
-          <file> 3</file>
+          <file> 11</file>
         </tool>
       </inputs>
     </file>
@@ -61,10 +67,72 @@
       <inputs>
         <tool>
           <name>XLINK</name>
-          <file> 6 2 7</file>
+          <file> 7 10 13</file>
         </tool>
       </inputs>
     </file>
+    <file>
+      <name>$PROJ_DIR$\main.c</name>
+      <outputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 10</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 11</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 6</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 6</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\Common\clk.c</name>
+      <outputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 2</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\Common\timer.c</name>
+      <outputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 0</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\Common\oled.c</name>
+      <outputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 3</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\Common\delay.c</name>
+      <outputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 1</file>
+        </tool>
+      </outputs>
+    </file>
+    <forcedrebuild>
+      <name>[REBUILD_ALL]</name>
+    </forcedrebuild>
   </configuration>
   <configuration>
     <name>Release</name>
@@ -72,6 +140,9 @@
     <forcedrebuild>
       <name>[MULTI_TOOL]</name>
       <tool>XLINK</tool>
+    </forcedrebuild>
+    <forcedrebuild>
+      <name>[REBUILD_ALL]</name>
     </forcedrebuild>
   </configuration>
 </project>
