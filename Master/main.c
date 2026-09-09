@@ -161,6 +161,6 @@ void main(void)
             else if(g_rtc.min != last_min) { last_min = g_rtc.min; draw_main_page(); }
         }
         if(g_ms - last_60s >= 60000) { last_60s += 60000; broadcast_time(); }
-        LED_ALARM = (alarm_on && (g_rtc.sec & 1)) ? 0 : 1;
+        LED_ALARM = (alarm_on && ((g_ms / 500) & 1)) ? 0 : 1;   /* 500ms 翻转 */
     }
 }

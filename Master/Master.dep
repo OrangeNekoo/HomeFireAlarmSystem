@@ -6,189 +6,61 @@
   <configuration>
     <name>Debug</name>
     <outputs>
-      <file>$PROJ_DIR$\..\Common\delay.c</file>
-      <file>$PROJ_DIR$\..\Common\uart.c</file>
-      <file>$PROJ_DIR$\main.c</file>
-      <file>$PROJ_DIR$\..\Common\clk.c</file>
       <file>$PROJ_DIR$\..\Common\oled.c</file>
-      <file>$PROJ_DIR$\..\Common\font16.c</file>
+      <file>$PROJ_DIR$\main.c</file>
       <file>$PROJ_DIR$\..\Common\frame.c</file>
+      <file>$PROJ_DIR$\..\Common\font16.c</file>
+      <file>$PROJ_DIR$\..\Common\uart.c</file>
       <file>$PROJ_DIR$\csv.c</file>
+      <file>$PROJ_DIR$\..\Common\clk.c</file>
       <file>$PROJ_DIR$\..\Common\timer.c</file>
-      <file>$PROJ_DIR$\Debug\Obj\main.r51</file>
-      <file>$PROJ_DIR$\..\Common\uart.h</file>
+      <file>$PROJ_DIR$\..\Common\delay.c</file>
       <file>$PROJ_DIR$\Debug\Exe\Master.d51</file>
-      <file>$PROJ_DIR$\Debug\Obj\font16.r51</file>
+      <file>$PROJ_DIR$\..\Common\clk.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\delay.r51</file>
+      <file>$PROJ_DIR$\Debug\Obj\frame.r51</file>
+      <file>$PROJ_DIR$\..\Common\uart.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\main.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\HomeFireAlarmSystem.pbd</file>
+      <file>$PROJ_DIR$\..\Common\rtc.h</file>
       <file>$PROJ_DIR$\..\Common\font16.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\rtc.r51</file>
+      <file>$PROJ_DIR$\..\Common\rtc.c</file>
+      <file>$PROJ_DIR$\..\Common\timer.h</file>
+      <file>$PROJ_DIR$\..\Common\rf.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\main.r51</file>
+      <file>$PROJ_DIR$\Debug\Obj\font16.r51</file>
       <file>$PROJ_DIR$\Debug\Obj\clk.r51</file>
       <file>$TOOLKIT_DIR$\lib\clib\cl-pli-nlpd-1e16x01.r51</file>
-      <file>$PROJ_DIR$\..\Common\timer.h</file>
-      <file>$PROJ_DIR$\..\Common\rtc.c</file>
       <file>$TOOLKIT_DIR$\inc\ioCC2530.h</file>
       <file>$PROJ_DIR$\..\Common\rf.h</file>
-      <file>$PROJ_DIR$\..\Common\rf.c</file>
-      <file>$PROJ_DIR$\Debug\Obj\rtc.r51</file>
       <file>$PROJ_DIR$\Debug\Obj\rf.r51</file>
-      <file>$PROJ_DIR$\..\Common\rtc.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\main.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\delay.r51</file>
-      <file>$PROJ_DIR$\..\Common\clk.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\frame.r51</file>
-      <file>$PROJ_DIR$\Debug\Obj\HomeFireAlarmSystem.pbd</file>
-      <file>$PROJ_DIR$\csv.h</file>
-      <file>$TOOLKIT_DIR$\inc\intrinsics.h</file>
-      <file>$PROJ_DIR$\..\Common\delay.h</file>
-      <file>$PROJ_DIR$\..\Common\frame.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\uart.r51</file>
-      <file>$TOOLKIT_DIR$\config\devices\Texas Instruments\lnk51ew_cc2530F256.xcl</file>
-      <file>$PROJ_DIR$\Debug\Obj\oled.r51</file>
       <file>$PROJ_DIR$\..\Common\oled.h</file>
-      <file>$TOOLKIT_DIR$\inc\clib\stdbool.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\timer.r51</file>
+      <file>$TOOLKIT_DIR$\inc\intrinsics.h</file>
+      <file>$TOOLKIT_DIR$\inc\clib\sysmac.h</file>
       <file>$PROJ_DIR$\Debug\Exe\HomeFireAlarmSystem.d51</file>
       <file>$PROJ_DIR$\Debug\Obj\csv.r51</file>
+      <file>$PROJ_DIR$\..\Common\frame.h</file>
+      <file>$TOOLKIT_DIR$\config\devices\Texas Instruments\lnk51ew_cc2530F256.xcl</file>
+      <file>$TOOLKIT_DIR$\inc\clib\stdbool.h</file>
+      <file>$PROJ_DIR$\..\Common\delay.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\oled.r51</file>
+      <file>$PROJ_DIR$\Debug\Obj\timer.r51</file>
+      <file>$PROJ_DIR$\Debug\Obj\uart.r51</file>
+      <file>$PROJ_DIR$\csv.h</file>
       <file>$TOOLKIT_DIR$\inc\clib\string.h</file>
-      <file>$TOOLKIT_DIR$\inc\clib\sysmac.h</file>
     </outputs>
     <file>
       <name>[ROOT_NODE]</name>
       <outputs>
         <tool>
           <name>XLINK</name>
-          <file> 11</file>
-        </tool>
-      </outputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\Common\delay.c</name>
-      <outputs>
-        <tool>
-          <name>ICC8051</name>
-          <file> 25</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICC8051</name>
-          <file> 18 30 37 31 16</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\Common\uart.c</name>
-      <outputs>
-        <tool>
-          <name>ICC8051</name>
-          <file> 33</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICC8051</name>
-          <file> 18 10 16</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\main.c</name>
-      <outputs>
-        <tool>
-          <name>ICC8051</name>
           <file> 9</file>
         </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 24</file>
-        </tool>
       </outputs>
-      <inputs>
-        <tool>
-          <name>ICC8051</name>
-          <file> 18 26 16 36 13 23 32 19 10 29</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 18</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\Common\clk.c</name>
-      <outputs>
-        <tool>
-          <name>ICC8051</name>
-          <file> 14</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICC8051</name>
-          <file> 18</file>
-        </tool>
-      </inputs>
     </file>
     <file>
       <name>$PROJ_DIR$\..\Common\oled.c</name>
-      <outputs>
-        <tool>
-          <name>ICC8051</name>
-          <file> 35</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICC8051</name>
-          <file> 18 30 37 36 31 16 13</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\Common\font16.c</name>
-      <outputs>
-        <tool>
-          <name>ICC8051</name>
-          <file> 12</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICC8051</name>
-          <file> 13</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\Common\frame.c</name>
-      <outputs>
-        <tool>
-          <name>ICC8051</name>
-          <file> 27</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICC8051</name>
-          <file> 18 32 16</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\csv.c</name>
-      <outputs>
-        <tool>
-          <name>ICC8051</name>
-          <file> 40</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICC8051</name>
-          <file> 18 41 42 29 16 10 23</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\Common\timer.c</name>
       <outputs>
         <tool>
           <name>ICC8051</name>
@@ -198,7 +70,135 @@
       <inputs>
         <tool>
           <name>ICC8051</name>
-          <file> 18 16</file>
+          <file> 26 30 36 29 37 20 17</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\main.c</name>
+      <outputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 22</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 14</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 26 10 20 29 17 16 34 27 13 41</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 26</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\Common\frame.c</name>
+      <outputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 12</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 26 34 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\Common\font16.c</name>
+      <outputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 23</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 17</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\Common\uart.c</name>
+      <outputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 40</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 26 13 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\csv.c</name>
+      <outputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 33</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 26 42 31 41 20 13 16</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\Common\clk.c</name>
+      <outputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 24</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 26</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\Common\timer.c</name>
+      <outputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 39</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 26 20</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\Common\delay.c</name>
+      <outputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 11</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 26 30 36 37 20</file>
         </tool>
       </inputs>
     </file>
@@ -207,37 +207,7 @@
       <inputs>
         <tool>
           <name>XLINK</name>
-          <file> 34 14 40 25 12 27 9 35 22 21 38 33 15</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\Common\rtc.c</name>
-      <outputs>
-        <tool>
-          <name>ICC8051</name>
-          <file> 21</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICC8051</name>
-          <file> 23 16 18</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\Common\rf.c</name>
-      <outputs>
-        <tool>
-          <name>ICC8051</name>
-          <file> 22</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICC8051</name>
-          <file> 18 19 16</file>
+          <file> 35 24 33 11 23 12 22 38 28 18 39 40 25</file>
         </tool>
       </inputs>
     </file>
@@ -246,7 +216,37 @@
       <inputs>
         <tool>
           <name>BILINK</name>
-          <file> 24</file>
+          <file> 14</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\Common\rtc.c</name>
+      <outputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 18</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 16 20 26</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\Common\rf.c</name>
+      <outputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 28</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICC8051</name>
+          <file> 26 27 20</file>
         </tool>
       </inputs>
     </file>
@@ -255,7 +255,7 @@
       <inputs>
         <tool>
           <name>XLINK</name>
-          <file> 34 9 15</file>
+          <file> 35 22 25</file>
         </tool>
       </inputs>
     </file>

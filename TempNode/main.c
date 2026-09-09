@@ -107,6 +107,6 @@ void main(void)
             if(dirty && !page_alarm) { draw_data_rows(); dirty = 0; }
         }
         handle_rf();
-        LED_ALARM = (page_alarm && (g_rtc.sec & 1)) ? 0 : 1;   /* 报警联动闪烁 */
+        LED_ALARM = (page_alarm && ((g_ms / 500) & 1)) ? 0 : 1;   /* 500ms 翻转 */
     }
 }

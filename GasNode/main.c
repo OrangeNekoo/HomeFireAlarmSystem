@@ -121,6 +121,6 @@ void main(void)
             }
         }
         handle_rf();
-        LED_ALARM = (page_alarm && (g_rtc.sec & 1)) ? 0 : 1;   /* 报警联动闪烁 */
+        LED_ALARM = (page_alarm && ((g_ms / 500) & 1)) ? 0 : 1;   /* 500ms 翻转 */
     }
 }
