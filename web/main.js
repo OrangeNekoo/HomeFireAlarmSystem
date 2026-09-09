@@ -20,11 +20,13 @@ function connectWS() {
   ws.onopen = () => {
     clearInterval(wsTimer);
     linkEl.textContent = "已连接"; linkEl.className = "online";
+    $("card-master").classList.add("online");
     if (state.demo) exitDemo();
     ws.send(JSON.stringify({ type: "setTime" }));   // 连上即对时
   };
   ws.onmessage = e => handleMsg(JSON.parse(e.data));
   ws.onclose = () => { linkEl.textContent = "未连接 · 演示模式"; linkEl.className = "offline";
+    $("card-master").classList.remove("online");
     wsTimer = setTimeout(connectWS, 3000); };
 }
 function sendCmd(obj) {
@@ -38,7 +40,7 @@ function handleMsg(m) {
     pushHist("temp", m.temp); pushHist("hum", m.hum); }
   if (m.type === "data" && m.node === 3) { state.nodes[3] = { online: true, gas: m.gas, do: m.do };
     pushHist("gas", m.gas); }
-  if (m.type === "status") { state.nodes[m.node].online = m.online; }
+  if (m.type === "status" && state.nodes[m.node]) { state.nodes[m.node].online = m.online; }
   if (m.type === "alarm") state.alarm = { on: m.on, src: m.src };
   if (m.type === "loss") state.loss[m.node] = m;
   if (m.type === "threshold") { $("th-temp").value = m.temp; $("th-gas").value = m.gas; }
@@ -47,10 +49,10 @@ function handleMsg(m) {
 
 /* ---------- 演示模式 ---------- */
 let demoTimer = null;
-function enterDemo() { state.demo = true; $("demo-badge").hidden = false;
+function enterDemo() { if (state.demo) return; state.demo = true; $("demo-badge").hidden = false;
   demoTimer = setInterval(demoTick, 1000); demoTick(); render(); }
 function exitDemo() { state.demo = false; $("demo-badge").hidden = true;
-  clearInterval(demoTimer); }
+  clearInterval(demoTimer); state.demoAlarmAt = 0; }
 function demoTick() {
   const t = 25 + Math.sin(Date.now() / 9000) * 2 + Math.random() * 0.4;
   const h = 60 + Math.sin(Date.now() / 7000) * 4;
@@ -110,7 +112,7 @@ $("btn-test-off").onclick = () => sendCmd({ type: "testAlarm", on: false });
 /* ---------- 时钟 ---------- */
 setInterval(() => {
   const d = new Date(), p = n => String(n).padStart(2, "0");
-  clockEl.textContent = `${d.getFullYear()}:${p(d.getMonth() + 1)}:${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+  clockEl.textContent = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
 }, 1000);
 
 connectWS();
