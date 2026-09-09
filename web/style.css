@@ -1,0 +1,42 @@
+:root {
+  --bg: #0b1c3f; --panel: #122448; --gold: #d3bc8e; --ink: #ece5d8;
+  --pyro: #ef7938; --hydro: #4cc2f1; --anemo: #74c2a8; --alarm: #d5544f;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: radial-gradient(ellipse at 50% 30%, #12264d 0%, var(--bg) 65%);
+  color: var(--ink); height: 100vh; display: flex; flex-direction: column;
+  font-family: "Noto Serif SC", "Source Han Serif SC", serif; overflow: hidden;
+}
+#topbar { display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 24px; border-bottom: 1px solid var(--gold); }
+#topbar .title { color: var(--gold); font-size: 20px; letter-spacing: 4px; }
+#link-info.online { color: #9fd6a8; } #link-info.offline { color: #888; }
+main { flex: 1; display: grid; grid-template-columns: 230px 1fr 260px; gap: 12px; padding: 12px; min-height: 0; }
+.node-card, .metric {
+  background: linear-gradient(160deg, var(--panel), #0d1c3a);
+  border: 1px solid var(--gold); clip-path: polygon(0 8px, 8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
+  padding: 12px; margin-bottom: 10px;
+}
+.node-card.online { box-shadow: 0 0 12px rgba(211,188,142,.45); }
+.node-card.alarm  { border-color: var(--alarm); animation: blink 0.6s infinite alternate; }
+.node-state { color: #888; font-size: 12px; } .node-card.online .node-state { color: var(--gold); }
+#stage3d { position: relative; } #stage3d canvas { width: 100%; height: 100%; display: block; }
+#demo-badge { position: absolute; right: 8px; top: 8px; color: #888; font-size: 12px; border: 1px solid #555; padding: 2px 8px; }
+.elem { display: inline-block; width: 26px; height: 26px; line-height: 26px; text-align: center;
+  border-radius: 50%; color: #fff; margin-right: 6px; }
+.pyro { background: var(--pyro); } .hydro { background: var(--hydro); } .anemo { background: var(--anemo); }
+.metric .val { font-size: 26px; color: var(--gold); }
+#console { display: flex; gap: 16px; align-items: center; padding: 10px 24px;
+  border-top: 1px solid var(--gold); }
+#console button {
+  background: transparent; border: 1px solid var(--gold); color: var(--gold);
+  padding: 6px 18px; cursor: pointer; font-family: inherit;
+}
+#console button:hover { background: rgba(211,188,142,.15); }
+#console input { width: 64px; background: var(--panel); color: var(--ink); border: 1px solid #445; padding: 4px; }
+#alarm-banner { color: var(--alarm); border: 1px solid var(--alarm); padding: 4px 14px;
+  animation: blink 0.5s infinite alternate; }
+#burst-overlay { position: fixed; inset: 0; pointer-events: none; opacity: 0;
+  background: radial-gradient(circle, rgba(255,200,120,.55), rgba(116,194,168,.25) 55%, transparent 75%); }
+@keyframes blink { from { opacity: 1; } to { opacity: .35; } }
