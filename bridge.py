@@ -106,7 +106,10 @@ class Bridge:
                     msg = json.loads(raw)
                 except json.JSONDecodeError:
                     continue
-                frame = build_downlink(msg)
+                try:
+                    frame = build_downlink(msg)
+                except (KeyError, ValueError, TypeError):
+                    continue
                 if frame:
                     self.ser.write(frame)
         finally:

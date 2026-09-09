@@ -59,6 +59,18 @@ class TestBuildDownlink(unittest.TestCase):
                              b"TIME,26,9,8,16,30,0*24\r\n")
     def test_unknown_rejected(self):
         self.assertIsNone(build_downlink({"type": "nonsense"}))
+    def test_malformed_raises(self):
+        # 畸形输入会抛异常（防护在 bridge.ws_handler 层捕获后 continue），
+        # 此处断言 build_downlink 本身抛出，防止未来改成静默返回导致防护失效
+        self.assertRaises((KeyError, ValueError, TypeError),
+                          build_downlink, {"type": "setThreshold"})        # 缺 temp/gas 键
+        self.assertRaises((KeyError, ValueError, TypeError),
+                          build_downlink, {"type": "setThreshold",
+                                           "temp": None, "gas": None})     # None
+        self.assertRaises((KeyError, ValueError, TypeError),
+                          build_downlink, {"type": "setThreshold",
+                                           "temp": "abc", "gas": 700})     # 非数字
+        self.assertIsNone(build_downlink({"type": 123}))                   # 非字符串 type 安全返回 None
 
 if __name__ == "__main__":
     unittest.main()
