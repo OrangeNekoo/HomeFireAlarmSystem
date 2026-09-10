@@ -94,7 +94,7 @@ static void handle_rf(void)           /* Óë TempNode ÏàÍ¬£º0x02 ¶ÔÊ±¡¢0x03 ±¨¾¯Ò
 void main(void)
 {
     u32 last_1s = 0, last_2s = 0;
-    u8  last_min = 0xFF, warmup = 30;         /* ÉÏµç 60s Ô¤ÈÈÆÚ£¨30 ´Î¡Á2s£© */
+    u8  last_min = 0xFF, warmup = 60;         /* ÉÏµç 60s Ô¤ÈÈÆÚ£¨Ãë£© */
     CLK_Init();
     T1_Init();
     RF_Init();
@@ -111,22 +111,19 @@ void main(void)
             last_1s = (now - last_1s > 5000) ? now : last_1s + 1000;   /* ¿¨¶Ù¹ı¾ÃÖ±½Ó¶ÔÆë·ÀÁ¬Ìø */
             rtc_sec_tick();
             if(page_alarm) LCD_Invert(g_rtc.sec & 1);   /* ±¨¾¯Ò³ 1Hz ·´ÏÔÉÁË¸ */
-            else if(g_rtc.min != last_min && !warmup) { last_min = g_rtc.min; draw_time_row(); }
+            else if(warmup)
+            {
+                warmup--;
+                if(warmup) draw_warmup(warmup);           /* Ã¿Ãë -1 µ¹¼ÆÊ± */
+                else draw_main_page();                    /* Ô¤ÈÈ½áÊø½øÖ÷Ò³Ãæ */
+            }
+            else if(g_rtc.min != last_min) { last_min = g_rtc.min; draw_time_row(); }
         }
         if(now - last_2s >= 2000)
         {
             last_2s += 2000;
             gas_avg = ADC_Avg6(ADC_Read6());
-            if(warmup)
-            {
-                warmup--;
-                if(!page_alarm)
-                {
-                    if(warmup) draw_warmup(warmup * 2);   /* Ã¿ 2s Ë¢ĞÂÊ£ÓàÃëÊı */
-                    else draw_main_page();                /* Ô¤ÈÈ½áÊø½øÖ÷Ò³Ãæ */
-                }
-            }
-            else
+            if(!warmup)
             {
                 send_report();              /* Êı¾İ°ü¼´ĞÄÌø */
                 if(!page_alarm) draw_data_rows();   /* ADC ÖµÃ¿ 2s Ë¢ĞÂ */
