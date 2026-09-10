@@ -90,14 +90,15 @@ void main(void)
     draw_time_row(); draw_data_rows();
     while(1)
     {
-        if(g_ms - last_1s >= 1000)
+        u32 now = ms_get();               /* 每圈取一次原子时间，圈内共用 */
+        if(now - last_1s >= 1000)
         {
-            last_1s += 1000;
+            last_1s = (now - last_1s > 5000) ? now : last_1s + 1000;   /* 卡顿过久直接对齐防连跳 */
             rtc_sec_tick();
             if(page_alarm) LCD_Invert(g_rtc.sec & 1);   /* 报警页 1Hz 反显闪烁 */
             else if(g_rtc.min != last_min) { last_min = g_rtc.min; draw_time_row(); }
         }
-        if(g_ms - last_2s >= 2000)
+        if(now - last_2s >= 2000)
         {
             last_2s += 2000;
             EA = 0;                     /* DHT11 时序 ~5ms，期间丢 RF 帧可接受（2s 周期） */
@@ -107,6 +108,6 @@ void main(void)
             if(dirty && !page_alarm) { draw_data_rows(); dirty = 0; }
         }
         handle_rf();
-        LED_ALARM = (page_alarm && ((g_ms / 500) & 1)) ? 0 : 1;   /* 500ms 翻转 */
+        LED_ALARM = (page_alarm && ((now / 500) & 1)) ? 0 : 1;   /* 500ms 翻转 */
     }
 }

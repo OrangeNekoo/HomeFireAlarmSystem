@@ -42,6 +42,13 @@ static void draw_data_rows(void)
     /* 行3（页6）：节点标识 */
     LCD_P8x16Str(40, 6, (u8 *)"NODE 3");
 }
+static void draw_warmup(u8 s)         /* 预热倒计时（剩余 s 秒，2s 步进） */
+{
+    char b[12];
+    b[0]='W'; b[1]='A'; b[2]='R'; b[3]='M'; b[4]=' '; b[5]='U'; b[6]='P'; b[7]=' ';
+    b[8]='0'+s/10%10; b[9]='0'+s%10; b[10]='s'; b[11]='\0';
+    LCD_P8x16Str(16, 4, (u8 *)b);
+}
 static void draw_alarm_page(void)
 {
     LCD_CLS();
@@ -94,25 +101,30 @@ void main(void)
     P1SEL &= ~0x01; P1DIR |= 0x01; LED_ALARM = 1;
     P0SEL &= ~0x20; P0DIR &= ~0x20;           /* P0.5 输入（MQ-2 DO） */
     LCD_Init(); LCD_CLS();
-    LCD_P8x16Str(16, 4, (u8 *)"WARM UP 60s"); /* 预热提示（ASCII） */
+    draw_warmup(60);                          /* 预热倒计时从 60s 开始 */
     draw_time_row();
     while(1)
     {
-        if(g_ms - last_1s >= 1000)
+        u32 now = ms_get();               /* 每圈取一次原子时间，圈内共用 */
+        if(now - last_1s >= 1000)
         {
-            last_1s += 1000;
+            last_1s = (now - last_1s > 5000) ? now : last_1s + 1000;   /* 卡顿过久直接对齐防连跳 */
             rtc_sec_tick();
             if(page_alarm) LCD_Invert(g_rtc.sec & 1);   /* 报警页 1Hz 反显闪烁 */
             else if(g_rtc.min != last_min && !warmup) { last_min = g_rtc.min; draw_time_row(); }
         }
-        if(g_ms - last_2s >= 2000)
+        if(now - last_2s >= 2000)
         {
             last_2s += 2000;
             gas_avg = ADC_Avg6(ADC_Read6());
             if(warmup)
             {
                 warmup--;
-                if(!warmup && !page_alarm) { LCD_CLS(); draw_data_rows(); }   /* 预热结束进主页面 */
+                if(!page_alarm)
+                {
+                    if(warmup) draw_warmup(warmup * 2);   /* 每 2s 刷新剩余秒数 */
+                    else draw_main_page();                /* 预热结束进主页面 */
+                }
             }
             else
             {
@@ -121,6 +133,6 @@ void main(void)
             }
         }
         handle_rf();
-        LED_ALARM = (page_alarm && ((g_ms / 500) & 1)) ? 0 : 1;   /* 500ms 翻转 */
+        LED_ALARM = (page_alarm && ((now / 500) & 1)) ? 0 : 1;   /* 500ms 翻转 */
     }
 }

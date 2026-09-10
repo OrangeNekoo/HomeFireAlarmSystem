@@ -1,6 +1,6 @@
 /* Common/rtc.c */
 #include "rtc.h"
-rtc_t g_rtc = {26, 1, 1, 12, 0, 0};   /* 上电默认值，等待串口对时覆盖 */
+rtc_t g_rtc = {26, 9, 10, 12, 0, 0};   /* 上电默认 2026-09-10 12:00，等待对时覆盖 */
 static const u8 day_tab[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 void rtc_set(const u8 *t)
 {
@@ -31,8 +31,8 @@ void rtc_sec_tick(void)
 void rtc_fmt(char *b)
 {
     b[0] = '2';  b[1] = '0';
-    b[2] = '0' + g_rtc.year / 10;  b[3] = '0' + g_rtc.year % 10;  b[4] = ':';
-    b[5] = '0' + g_rtc.mon / 10;   b[6] = '0' + g_rtc.mon % 10;   b[7] = ':';
+    b[2] = '0' + g_rtc.year / 10;  b[3] = '0' + g_rtc.year % 10;  b[4] = '-';
+    b[5] = '0' + g_rtc.mon / 10;   b[6] = '0' + g_rtc.mon % 10;   b[7] = '-';
     b[8] = '0' + g_rtc.day / 10;   b[9] = '0' + g_rtc.day % 10;   b[10] = ' ';
     b[11] = '0' + g_rtc.hour / 10; b[12] = '0' + g_rtc.hour % 10; b[13] = ':';
     b[14] = '0' + g_rtc.min / 10;  b[15] = '0' + g_rtc.min % 10;  b[16] = '\0';

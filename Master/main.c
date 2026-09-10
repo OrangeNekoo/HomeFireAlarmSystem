@@ -117,7 +117,7 @@ static void handle_rf(void)               /* 序号连续性统计丢包 */
         n2.last_seq = out[0];
         n2.temp_i = out[1]; n2.temp_d = out[2]; n2.hum_i = out[3]; n2.hum_d = out[4];
         if(!n2.online) { n2.online = 1; csv_send_status(2, 1); csv_send_loss(2, n2.loss, n2.total); }
-        n2.last_ms = g_ms;
+        n2.last_ms = ms_get();
         csv_send_data_th(n2.temp_i, n2.temp_d, n2.hum_i, n2.hum_d);
         if(!alarm_on) draw_values();          /* 局部刷新数值行，不清屏不闪 */
     }
@@ -129,21 +129,22 @@ static void handle_rf(void)               /* 序号连续性统计丢包 */
         n3.last_seq = out[0];
         n3.gas = ((u16)out[1] << 8) | out[2]; n3.gas_do = out[3];
         if(!n3.online) { n3.online = 1; csv_send_status(3, 1); csv_send_loss(3, n3.loss, n3.total); }
-        n3.last_ms = g_ms;
+        n3.last_ms = ms_get();
         csv_send_data_gas(n3.gas, n3.gas_do);
         if(!alarm_on) draw_values();
     }
 }
 static void check_offline(void)              /* 1s 调一次；10s 无心跳判离线 */
 {
-    if(n2.online && g_ms - n2.last_ms > 10000)
+    u32 now = ms_get();
+    if(n2.online && now - n2.last_ms > 10000)
     { n2.online = 0; csv_send_status(2, 0); csv_send_loss(2, n2.loss, n2.total); if(!alarm_on) draw_values(); }
-    if(n3.online && g_ms - n3.last_ms > 10000)
+    if(n3.online && now - n3.last_ms > 10000)
     { n3.online = 0; csv_send_status(3, 0); csv_send_loss(3, n3.loss, n3.total); if(!alarm_on) draw_values(); }
 }
 void main(void)
 {
-    u32 last_500 = 0, last_1s = 0, last_60s = 0;
+    u32 last_500 = 0, last_1s = 0, last_10s = 0;
     u8  last_min = 0xFF;
     CLK_Init();
     T1_Init();
@@ -155,6 +156,7 @@ void main(void)
     csv_send_thresh(th_temp, th_gas);        /* 上线告知上位机当前阈值 */
     while(1)
     {
+        u32 now = ms_get();               /* 每圈取一次原子时间，圈内共用 */
         if(uart_line_ready)
         {
             u8 r = csv_handle_line();
@@ -162,16 +164,17 @@ void main(void)
             else if(r == 3) { broadcast_time(); if(!alarm_on) draw_time_row(); }
         }
         handle_rf();
-        if(g_ms - last_500 >= 500) { last_500 += 500; judge_alarm(); }
-        if(g_ms - last_1s >= 1000)
+        if(now - last_500 >= 500) { last_500 += 500; judge_alarm(); }
+        if(now - last_1s >= 1000)
         {
-            last_1s += 1000;
+            /* 卡顿过久（>5s）直接对齐，只防秒数连跳，不追补历史 tick */
+            last_1s = (now - last_1s > 5000) ? now : last_1s + 1000;
             rtc_sec_tick();
             check_offline();
             if(alarm_on) LCD_Invert(g_rtc.sec & 1);      /* 报警 1Hz 闪烁 */
             else if(g_rtc.min != last_min) { last_min = g_rtc.min; draw_time_row(); }
         }
-        if(g_ms - last_60s >= 60000) { last_60s += 60000; broadcast_time(); }
-        LED_ALARM = (alarm_on && ((g_ms / 500) & 1)) ? 0 : 1;   /* 500ms 翻转 */
+        if(now - last_10s >= 10000) { last_10s += 10000; broadcast_time(); }   /* 10s 周期对时，新节点入网即同步 */
+        LED_ALARM = (alarm_on && ((now / 500) & 1)) ? 0 : 1;   /* 500ms 翻转 */
     }
 }

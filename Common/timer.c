@@ -2,6 +2,15 @@
 #include <ioCC2530.h>
 #include "timer.h"
 volatile u32 g_ms = 0;
+u32 ms_get(void)                  /* 8051 读 u32 非原子，关中断读取防撕裂 */
+{
+    u32 v;
+    u8 ie = EA;
+    EA = 0;
+    v = g_ms;
+    EA = ie;
+    return v;
+}
 void T1_Init(void)
 {
     T1CC0L = 249;                 /* 32MHz/128 = 250kHz，250 计数 = 1ms */
