@@ -1,109 +1,117 @@
-/* Common/oled.c — SSD1306 0.96寸 128×64，I2C 软件模拟（约 350kHz） */
-/* 模块 QG-2864TMBEG01（BS[2:0]=010 选 I2C），从地址 0x3C，写地址 0x78 */
+/* Common/oled.c — SSD1306 0.96寸 128×64，4线SPI 软件模拟 */
+/* 引脚与初始化严格参照 docs/OLED资料/LCD_OLED示例代码/LCD.h（模块实测为 SPI 接线） */
 #include <ioCC2530.h>
-#include <intrinsics.h>       /* __no_operation 内建函数声明（消除 Pe223 隐式声明警告，任务 2 经验） */
 #include "oled.h"
 #include "delay.h"
 #include "font16.h"
 
-#define OLED_ADDR 0x78          /* 上屏失败改试 0x7A（0x3D） */
+#define LCD_SCL P1_2       /* SCLK  时钟 D0（SCLK） */
+#define LCD_SDA P1_3       /* SDA   D1（MOSI） 数据 */
+#define LCD_RST P1_7       /* _RES  hardware reset   复位 */
+#define LCD_DC  P0_0       /* A0  H/L 命令数据选通端，H：数据，L:命令 */
 
-void LCD_Fill(unsigned char bmp_dat);     /* 前置声明：LCD_Init 先于定义处调用 */
-
-#define SCL_H() (P1_2 = 1)
-#define SCL_L() (P1_2 = 0)
-#define SDA_H() (P1DIR &= ~0x08)          /* SDA 释放为高阻，靠模块板载上拉 */
-#define SDA_L() (P1_3 = 0, P1DIR |= 0x08) /* SDA 推挽拉低 */
-
-static void i2c_dly(void)                 /* 半周期约 0.8us @32MHz */
-{
-    __no_operation(); __no_operation(); __no_operation();
-    __no_operation(); __no_operation(); __no_operation();
-}
-static void i2c_start(void)
-{
-    SDA_H(); SCL_H(); i2c_dly();
-    SDA_L(); i2c_dly();
-    SCL_L();
-}
-static void i2c_stop(void)
-{
-    SDA_L(); i2c_dly();
-    SCL_H(); i2c_dly();
-    SDA_H(); i2c_dly();
-}
-static void i2c_wr_byte(unsigned char dat)    /* 8 位数据 + 第 9 位读 ACK（不校验） */
+/*********************LCD写数据（照示例代码）********************/
+void LCD_WrDat(unsigned char dat)
 {
     unsigned char i;
+    LCD_DC = 1;                 /* 高：数据 */
     for(i = 0; i < 8; i++)
     {
-        if(dat & 0x80) SDA_H(); else SDA_L();
+        LCD_SCL = 0;
+        if(dat & 0x80) LCD_SDA = 1; else LCD_SDA = 0;
+        LCD_SCL = 1;
         dat <<= 1;
-        i2c_dly();
-        SCL_H(); i2c_dly();
-        SCL_L();
     }
-    SDA_H();                     /* 释放 SDA 读 ACK */
-    i2c_dly();
-    SCL_H(); i2c_dly();
-    SCL_L();
 }
-/* —— SSD1306 事务封装（I2C 控制字节：0x00 命令流 / 0x40 数据流） —— */
-static void oled_cmd(unsigned char c)
+/*********************LCD写命令（照示例代码）********************/
+void LCD_WrCmd(unsigned char cmd)
 {
-    i2c_start();
-    i2c_wr_byte(OLED_ADDR);
-    i2c_wr_byte(0x00);
-    i2c_wr_byte(c);
-    i2c_stop();
+    unsigned char i;
+    LCD_DC = 0;                 /* 低：命令 */
+    for(i = 0; i < 8; i++)
+    {
+        LCD_SCL = 0;
+        if(cmd & 0x80) LCD_SDA = 1; else LCD_SDA = 0;
+        LCD_SCL = 1;
+        cmd <<= 1;
+    }
 }
-static void oled_data(unsigned char d)
-{
-    i2c_start();
-    i2c_wr_byte(OLED_ADDR);
-    i2c_wr_byte(0x40);
-    i2c_wr_byte(d);
-    i2c_stop();
-}
-/* —— 显示层（签名与示例代码一致） —— */
-void LCD_WrCmd(unsigned char cmd) { oled_cmd(cmd); }
-void LCD_WrDat(unsigned char dat) { oled_data(dat); }
+/*********************LCD 设置坐标********************/
 void LCD_Set_Pos(unsigned char x, unsigned char y)
 {
     LCD_WrCmd(0xb0 + y);
     LCD_WrCmd(((x & 0xf0) >> 4) | 0x10);
-    LCD_WrCmd(x & 0x0f);        /* 示例代码此处误写 |0x01 会整体偏移 1 列，I2C 版修正 */
+    LCD_WrCmd(x & 0x0f);        /* 示例原文 |0x01 会造成列偏移不均匀，按标准命令格式修正 */
 }
-void LCD_Init(void)
-{
-    P1SEL &= ~0x0C;             /* P1.2/P1.3 普通 IO */
-    P1DIR |= 0x04;              /* SCL 输出；SDA 保持输入（释放） */
-    SCL_H(); SDA_H();
-    Delay_ms(100);              /* I2C 模块无复位脚，等上电稳定 */
-    LCD_WrCmd(0xae); LCD_WrCmd(0x00); LCD_WrCmd(0x10); LCD_WrCmd(0x40);
-    LCD_WrCmd(0x81); LCD_WrCmd(0xcf); LCD_WrCmd(0xa1); LCD_WrCmd(0xc8);
-    LCD_WrCmd(0xa6); LCD_WrCmd(0xa8); LCD_WrCmd(0x3f); LCD_WrCmd(0xd3);
-    LCD_WrCmd(0x00); LCD_WrCmd(0xd5); LCD_WrCmd(0x80); LCD_WrCmd(0xd9);
-    LCD_WrCmd(0xf1); LCD_WrCmd(0xda); LCD_WrCmd(0x12); LCD_WrCmd(0xdb);
-    LCD_WrCmd(0x40); LCD_WrCmd(0x20); LCD_WrCmd(0x02); LCD_WrCmd(0x8d);
-    LCD_WrCmd(0x14);            /* 电荷泵使能 */
-    LCD_WrCmd(0xa4); LCD_WrCmd(0xa6);
-    LCD_WrCmd(0xaf);            /* display ON */
-    LCD_Fill(0x00);
-}
+/*********************LCD全屏填充********************/
 void LCD_Fill(unsigned char bmp_dat)
 {
     unsigned char y, x;
     for(y = 0; y < 8; y++)
     {
         LCD_WrCmd(0xb0 + y);
-        LCD_WrCmd(0x00); LCD_WrCmd(0x10);
+        LCD_WrCmd(0x00);        /* 示例原文 0x01 同源列偏移，修正 */
+        LCD_WrCmd(0x10);
         for(x = 0; x < 128; x++) LCD_WrDat(bmp_dat);
     }
 }
-void LCD_CLS(void) { LCD_Fill(0x00); }
-void LCD_Invert(unsigned char on) { LCD_WrCmd(on ? 0xA7 : 0xA6); }
-/***************功能描述：显示6*8一组标准ASCII字符串    显示的坐标（x,y），y为页范围0～7****************/
+/*********************LCD清屏********************/
+void LCD_CLS(void)
+{
+    LCD_Fill(0x00);
+}
+/*********************整屏反显（报警界面用）********************/
+void LCD_Invert(unsigned char on)
+{
+    LCD_WrCmd(on ? 0xA7 : 0xA6);
+}
+/*********************LCD初始化（照示例代码）********************/
+void LCD_Init(void)
+{
+    P0SEL &= 0xFE;              /* P0.0 普通 IO */
+    P0DIR |= 0x01;              /* P0.0 输出（DC） */
+
+    P1SEL &= 0x73;              /* P1.2/P1.3/P1.7 普通 IO */
+    P1DIR |= 0x8C;              /* P1.2/P1.3/P1.7 输出 */
+
+    LCD_SCL = 1;
+    LCD_RST = 0;                /* 硬件复位（SPI 模块必须） */
+    Delay_ms(50);
+    LCD_RST = 1;                /* 等待 RC 复位完毕 */
+
+    LCD_WrCmd(0xae);            /* turn off oled panel */
+    LCD_WrCmd(0x00);            /* set low column address */
+    LCD_WrCmd(0x10);            /* set high column address */
+    LCD_WrCmd(0x40);            /* set start line address */
+    LCD_WrCmd(0x81);            /* set contrast control register */
+    LCD_WrCmd(0xcf);            /* Set SEG Output Current Brightness */
+    LCD_WrCmd(0xa1);            /* Set SEG/Column Mapping 0xa1正常 */
+    LCD_WrCmd(0xc8);            /* Set COM/Row Scan Direction 0xc8正常 */
+    LCD_WrCmd(0xa6);            /* normal display */
+    LCD_WrCmd(0xa8);            /* multiplex ratio(1 to 64) */
+    LCD_WrCmd(0x3f);            /* 1/64 duty */
+    LCD_WrCmd(0xd3);            /* set display offset */
+    LCD_WrCmd(0x00);            /* not offset */
+    LCD_WrCmd(0xd5);            /* set display clock divide ratio/oscillator frequency */
+    LCD_WrCmd(0x80);            /* 100 Frames/Sec */
+    LCD_WrCmd(0xd9);            /* set pre-charge period */
+    LCD_WrCmd(0xf1);            /* Pre-Charge as 15 Clocks & Discharge as 1 Clock */
+    LCD_WrCmd(0xda);            /* set com pins hardware configuration */
+    LCD_WrCmd(0x12);
+    LCD_WrCmd(0xdb);            /* set vcomh */
+    LCD_WrCmd(0x40);            /* Set VCOM Deselect Level */
+    LCD_WrCmd(0x20);            /* Set Page Addressing Mode */
+    LCD_WrCmd(0x02);
+    LCD_WrCmd(0x8d);            /* set Charge Pump enable/disable */
+    LCD_WrCmd(0x14);            /* enable */
+    LCD_WrCmd(0xa4);            /* Disable Entire Display On */
+    LCD_WrCmd(0xa6);            /* Disable Inverse Display On */
+    LCD_WrCmd(0xaf);            /* turn on oled panel */
+
+    LCD_Fill(0x00);             /* 清屏 */
+    LCD_Set_Pos(0, 0);
+}
+/***************功能描述：显示6*8一组标准ASCII字符串（照示例代码）****************/
 void LCD_P6x8Str(unsigned char x, unsigned char y, unsigned char ch[])
 {
     unsigned char c = 0, i = 0, j = 0;
@@ -118,7 +126,7 @@ void LCD_P6x8Str(unsigned char x, unsigned char y, unsigned char ch[])
         j++;
     }
 }
-/*******************功能描述：显示8*16一组标准ASCII字符串     显示的坐标（x,y），y为页范围0～7****************/
+/*******************功能描述：显示8*16一组标准ASCII字符串（照示例代码）*******************/
 void LCD_P8x16Str(unsigned char x, unsigned char y, unsigned char ch[])
 {
     unsigned char c = 0, i = 0, j = 0;
@@ -136,13 +144,21 @@ void LCD_P8x16Str(unsigned char x, unsigned char y, unsigned char ch[])
         j++;
     }
 }
-/*****************功能描述：显示16*16点阵  显示的坐标（x,y），y为页范围0～7****************************/
-void LCD_P16x16Ch(unsigned char x, unsigned char y, unsigned char N)  /* N = 汉字索引 */
+/*****************功能描述：显示16*16点阵汉字（照示例代码，N=字模索引）*****************/
+void LCD_P16x16Ch(unsigned char x, unsigned char y, unsigned char N)
 {
     unsigned char wm;
     unsigned int adder = 32 * N;
     LCD_Set_Pos(x, y);
-    for(wm = 0; wm < 16; wm++) LCD_WrDat(F16x16[adder++]);
+    for(wm = 0; wm < 16; wm++)
+    {
+        LCD_WrDat(F16x16[adder]);
+        adder += 1;
+    }
     LCD_Set_Pos(x, y + 1);
-    for(wm = 0; wm < 16; wm++) LCD_WrDat(F16x16[adder++]);
+    for(wm = 0; wm < 16; wm++)
+    {
+        LCD_WrDat(F16x16[adder]);
+        adder += 1;
+    }
 }
