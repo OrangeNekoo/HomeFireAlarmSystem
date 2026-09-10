@@ -174,7 +174,12 @@ void main(void)
             if(alarm_on) LCD_Invert(g_rtc.sec & 1);      /* 报警 1Hz 闪烁 */
             else if(g_rtc.min != last_min) { last_min = g_rtc.min; draw_time_row(); }
         }
-        if(now - last_10s >= 10000) { last_10s += 10000; broadcast_time(); }   /* 10s 周期对时，新节点入网即同步 */
+        if(now - last_10s >= 10000)
+        {
+            last_10s += 10000;
+            broadcast_time();                 /* 10s 周期对时，新节点入网即同步 */
+            csv_send_status(1, 1);            /* 主节点串口心跳：网页忽略 node=1，供 bridge 日志诊断串口上行 */
+        }
         LED_ALARM = (alarm_on && ((now / 500) & 1)) ? 0 : 1;   /* 500ms 翻转 */
     }
 }
