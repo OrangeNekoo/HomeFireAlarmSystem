@@ -72,7 +72,7 @@
         <option>
           <name>Calling convention</name>
           <version>0</version>
-          <state>3</state>
+          <state>4</state>
         </option>
         <option>
           <name>Workseg Size</name>
@@ -150,7 +150,7 @@
         </option>
         <option>
           <name>RTLibraryPath</name>
-          <state>$TOOLKIT_DIR$\LIB\CLIB\cl-pli-nsid-1e16x01.r51</state>
+          <state>$TOOLKIT_DIR$\LIB\CLIB\cl-pli-nlpd-1e16x01.r51</state>
         </option>
         <option>
           <name>Input variant</name>
@@ -694,7 +694,7 @@
         </option>
         <option>
           <name>OutputFile</name>
-          <state>HomeFireAlarmSystem.d51</state>
+          <state>Master.d51</state>
         </option>
         <option>
           <name>OutputFormat</name>
@@ -2065,22 +2065,13 @@
     </settings>
   </configuration>
   <file>
-    <name>$PROJ_DIR$\main.c</name>
+    <name>$PROJ_DIR$\..\Common\clk.c</name>
   </file>
   <file>
     <name>$PROJ_DIR$\csv.c</name>
   </file>
   <file>
-    <name>$PROJ_DIR$\..\Common\clk.c</name>
-  </file>
-  <file>
-    <name>$PROJ_DIR$\..\Common\timer.c</name>
-  </file>
-  <file>
     <name>$PROJ_DIR$\..\Common\delay.c</name>
-  </file>
-  <file>
-    <name>$PROJ_DIR$\..\Common\oled.c</name>
   </file>
   <file>
     <name>$PROJ_DIR$\..\Common\font16.c</name>
@@ -2089,13 +2080,22 @@
     <name>$PROJ_DIR$\..\Common\frame.c</name>
   </file>
   <file>
-    <name>$PROJ_DIR$\..\Common\uart.c</name>
+    <name>$PROJ_DIR$\main.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\..\Common\oled.c</name>
   </file>
   <file>
     <name>$PROJ_DIR$\..\Common\rf.c</name>
   </file>
   <file>
     <name>$PROJ_DIR$\..\Common\rtc.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\..\Common\timer.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\..\Common\uart.c</name>
   </file>
 </project>
 
