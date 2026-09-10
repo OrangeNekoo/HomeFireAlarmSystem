@@ -9,7 +9,8 @@ void UART_Init(void)
 {
     PERCFG &= ~0x01;              /* USART0 位置 1：P0.2 RX、P0.3 TX */
     P0SEL |= 0x0C;                /* P0.2/P0.3 外设功能 */
-    U0GCR = 12; U0BAUD = 216;     /* 115200 @ 32MHz */
+    U0GCR = 11; U0BAUD = 216;     /* 115200 @ 32MHz：(256+216)×2^11/2^28×32M≈115235。
+                                     注意 U0GCR=12 是 230400（曾因此与上位机 2 倍失配全乱码） */
     U0CSR |= 0xC0;                /* UART 模式 + 接收使能 */
     UTX0IF = 0;
     URX0IE = 1;                   /* 接收中断使能 */
