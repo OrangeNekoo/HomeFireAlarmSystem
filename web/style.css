@@ -1,42 +1,118 @@
+/* web/style.css — Dell 1996 目录风（严格遵循 DESIGN.md：黑页框、ribbon 彩卡、
+   Arial Black 标题、Times/宋体正文、零圆角零阴影，圆仅用于印章） */
 :root {
-  --bg: #0b1c3f; --panel: #122448; --gold: #d3bc8e; --ink: #ece5d8;
-  --pyro: #ef7938; --hydro: #4cc2f1; --anemo: #74c2a8; --alarm: #d5544f;
+  --primary: #e91d2a;  /* Dell 红：仅用于警报 CTA、电话位、印章 */
+  --yellow: #fcc20f;   /* 贴纸黄 */
+  --purple: #6a26a4;
+  --link: #0000ee;     /* Mosaic/Netscape 经典链接蓝 */
+  --ink: #000000;
+  --canvas: #ffffff;
+  --olive: #8e8a25;  --sage: #b3bd95;  --salmon: #d77a7a;  --peach: #e6915d;
+  --lime: #c0d4a7;   --sky: #9ab6c8;   --steel: #a5b8c0;   --periwinkle: #8c9ae0;
+  /* 迷你曲线色（drawCurve 从这里取）：紫/红/橄榄，分别落在 sage/sage/salmon 卡体上 */
+  --pyro: #6a26a4;  --hydro: #e91d2a;  --anemo: #8e8a25;
+  --sans: Arial, Helvetica, sans-serif;
+  --black: "Arial Black", Arial, sans-serif;
+  --serif: "Times New Roman", SimSun, Times, serif;
 }
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  background: radial-gradient(ellipse at 50% 30%, #12264d 0%, var(--bg) 65%);
-  color: var(--ink); height: 100vh; display: flex; flex-direction: column;
-  font-family: "Noto Serif SC", "Source Han Serif SC", serif; overflow: hidden;
-}
-#topbar { display: flex; justify-content: space-between; align-items: center;
-  padding: 10px 24px; border-bottom: 1px solid var(--gold); }
-#topbar .title { color: var(--gold); font-size: 20px; letter-spacing: 4px; }
-#link-info.online { color: #9fd6a8; } #link-info.offline { color: #888; }
-main { flex: 1; display: grid; grid-template-columns: 230px 1fr 260px; gap: 12px; padding: 12px; min-height: 0; }
-.node-card, .metric {
-  background: linear-gradient(160deg, var(--panel), #0d1c3a);
-  border: 1px solid var(--gold); clip-path: polygon(0 8px, 8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
-  padding: 12px; margin-bottom: 10px;
-}
-.node-card.online { box-shadow: 0 0 12px rgba(211,188,142,.45); }
-.node-card.alarm  { border-color: var(--alarm); animation: blink 0.6s infinite alternate; }
-.node-state { color: #888; font-size: 12px; } .node-card.online .node-state { color: var(--gold); }
-#stage3d { position: relative; } #stage3d canvas { width: 100%; height: 100%; display: block; }
-#demo-badge { position: absolute; right: 8px; top: 8px; color: #888; font-size: 12px; border: 1px solid #555; padding: 2px 8px; }
-.elem { display: inline-block; width: 26px; height: 26px; line-height: 26px; text-align: center;
-  border-radius: 50%; color: #fff; margin-right: 6px; }
-.pyro { background: var(--pyro); } .hydro { background: var(--hydro); } .anemo { background: var(--anemo); }
-.metric .val { font-size: 26px; color: var(--gold); }
-#console { display: flex; gap: 16px; align-items: center; padding: 10px 24px;
-  border-top: 1px solid var(--gold); }
-#console button {
-  background: transparent; border: 1px solid var(--gold); color: var(--gold);
-  padding: 6px 18px; cursor: pointer; font-family: inherit;
-}
-#console button:hover { background: rgba(211,188,142,.15); }
-#console input { width: 64px; background: var(--panel); color: var(--ink); border: 1px solid #445; padding: 4px; }
-#alarm-banner { color: var(--alarm); border: 1px solid var(--alarm); padding: 4px 14px;
-  animation: blink 0.5s infinite alternate; }
-#burst-overlay { position: fixed; inset: 0; pointer-events: none; opacity: 0;
-  background: radial-gradient(circle, rgba(255,200,120,.55), rgba(116,194,168,.25) 55%, transparent 75%); }
+[hidden] { display: none !important; }
+* { margin: 0; padding: 0; box-sizing: border-box; border-radius: 0; }
+body { background: var(--canvas); color: var(--ink);
+  font-family: var(--serif); font-size: 14px; line-height: 1.4; }
+
+/* ── page-frame：整页黑色相框，品牌第一识别物 ── */
+#frame { max-width: 792px; margin: 16px auto; border: 8px solid #000; background: var(--canvas); }
+
+/* ── top-banner：黑底白字 + 黄贴纸 + 红色"电话位"连接状态 ── */
+#topbar { background: #000; color: #fff; display: flex; align-items: center;
+  gap: 12px; padding: 12px 16px; }
+.banner-text { flex: 1; min-width: 0; }
+.banner-title { font-family: var(--sans); font-weight: 700; font-size: 16px; }
+.banner-sub { font-size: 12px; margin-top: 2px; }
+#buy-sticker { background: var(--yellow); color: #000; border: 1px solid #000;
+  font-family: var(--sans); font-weight: 700; font-size: 12px; padding: 4px 8px; white-space: nowrap; }
+#demo-badge { background: var(--yellow); color: #000; border: 1px solid #000;
+  font-family: var(--sans); font-weight: 700; font-size: 12px; padding: 4px 8px;
+  white-space: nowrap; transform: rotate(-3deg); }
+#link-info { background: #000; color: var(--primary); font-family: var(--sans);
+  font-weight: 700; font-size: 16px; padding: 4px 8px; white-space: nowrap; }
+#link-info.offline { color: #888; }
+
+#clock-row { display: flex; justify-content: space-between; align-items: baseline;
+  gap: 12px; padding: 8px 16px; border-bottom: 1px solid #000; }
+#clock { font-size: 20px; }
+.best-view { font-size: 11px; }
+
+/* ── 两列目录布局：左轨 220px + 右产品列 ── */
+main { display: flex; gap: 16px; padding: 16px; }
+#left-rail { width: 220px; flex: none; }
+#right-col { flex: 1; min-width: 0; }
+
+/* eyebrow：Arial Black 900 大字压在橄榄色块上 */
+.eyebrow { background: var(--olive); font-family: var(--black); font-weight: 900;
+  font-size: 36px; line-height: 1.05; padding: 24px 16px; margin-bottom: 16px; }
+
+/* ── ribbon 卡：白标题栏(黑下划线) + 彩色体块 ── */
+.node-card, .metric { border: 1px solid #000; background: #fff; margin-bottom: 16px; }
+#left-rail .node-card { margin-bottom: 12px; }
+.ribbon-title { border-bottom: 1px solid #000; font-family: var(--sans);
+  font-weight: 700; font-size: 14px; padding: 6px 12px; }
+.ribbon-body { padding: 12px 16px; }
+.steel  { background: var(--steel); }
+.sage   { background: var(--sage); }
+.salmon { background: var(--salmon); }
+
+.node-name { font-weight: 700; }
+.node-state { font-size: 12px; color: #333; }
+.node-card.online .node-state { font-size: 0; color: transparent; }
+.node-card.online .node-state::after {
+  content: "状态：ONLINE"; font-size: 12px; color: #000;
+  font-family: var(--sans); font-weight: 700; }
+.node-data { font-size: 18px; font-weight: 700; }
+.node-card .node-state { display: block; margin-top: 4px; }
+
+/* 报警：标题栏翻红 + 闪烁（1996 允许 GIF 式闪烁） */
+.node-card.alarm .ribbon-title { background: var(--primary); color: #fff; }
+.node-card.alarm { animation: blink .6s infinite alternate; }
+
+/* 数据读数与迷你曲线 */
+.readings { display: flex; gap: 16px; margin-top: 12px; }
+.reading { flex: 1; min-width: 0; }
+.metric .val { font-family: var(--black); font-weight: 900; font-size: 26px; }
+.metric canvas { display: block; margin-top: 6px; max-width: 100%; }
+#loss-info { font-size: 12px; padding: 0 2px; }
+
+/* ── footer 控制台 ── */
+#console { border-top: 1px solid #000; padding: 16px; }
+#alarm-banner { background: var(--primary); color: #fff; font-family: var(--sans);
+  font-weight: 700; font-size: 16px; padding: 16px; text-align: center;
+  margin-bottom: 12px; animation: blink .5s infinite alternate; }
+.console-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 12px; }
+.console-row input { background: #fff; color: #000; border: 1px solid #000;
+  font-family: var(--serif); font-size: 14px; padding: 4px 6px; width: 64px; }
+button { font-family: var(--sans); font-weight: 700; font-size: 12px;
+  padding: 6px 16px; cursor: pointer; }
+.btn-primary   { background: #000; color: #fff; border: 1px solid #000; }
+.btn-secondary { background: #fff; color: #000; border: 1px solid #000; }
+
+.footer-nav { display: flex; justify-content: space-around; text-align: center;
+  border-top: 1px solid var(--sage); padding-top: 8px; margin-top: 4px; }
+.footer-nav span { font-family: var(--sans); font-weight: 700; font-size: 12px; padding: 8px; }
+.footer-nav .cn { display: block; font-family: var(--serif); font-weight: 400; }
+.footer-legal { text-align: center; font-size: 11px; padding-top: 8px; }
+.footer-legal a { color: var(--link); text-decoration: underline; }
+
 @keyframes blink { from { opacity: 1; } to { opacity: .35; } }
+
+/* ── 响应式（DESIGN.md 断点）：≤820px 框 4px 单列；≤480px 框 2px ── */
+@media (max-width: 820px) {
+  #frame { margin: 8px; border-width: 4px; }
+  main { flex-direction: column; }
+  #left-rail { width: auto; }
+}
+@media (max-width: 480px) {
+  #frame { margin: 4px; border-width: 2px; }
+  .eyebrow { font-size: 24px; padding: 16px; }
+  #link-info { font-size: 12px; }
+  .readings { flex-direction: column; }
+}

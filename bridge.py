@@ -75,12 +75,17 @@ class Bridge:
         self.loop = None
 
     def reader_thread(self):
-        """串口读线程：逐行解析 -> WS 广播（带桥端时间戳）"""
+        """串口读线程：逐行解析 -> WS 广播（带桥端时间戳），全程打印诊断日志"""
         buf = b""
+        idle = 0
         while True:
             data = self.ser.read(64)
             if not data:
+                idle += 1
+                if idle % 30 == 0:      # timeout=1s，30 次即 30 秒无数据
+                    print("[RX] 30 秒未收到串口数据：请检查主节点串口线 / COM 口 / 波特率(115200)")
                 continue
+            idle = 0
             buf += data
             while b"\n" in buf:
                 line, buf = buf.split(b"\n", 1)
@@ -90,7 +95,10 @@ class Bridge:
                 msg = parse_line(text)
                 if msg:
                     msg["ts"] = time.time()
+                    print(f"[RX] {text} -> 已广播")
                     asyncio.run_coroutine_threadsafe(self.broadcast(msg), self.loop)
+                else:
+                    print(f"[RX] 无法解析（校验失败或未知格式）: {text!r}")
 
     async def broadcast(self, msg: dict):
         if clients:
@@ -100,6 +108,7 @@ class Bridge:
 
     async def ws_handler(self, ws):
         clients.add(ws)
+        print(f"[WS] 网页客户端已连接（当前 {len(clients)} 个）")
         try:
             async for raw in ws:
                 try:
@@ -112,8 +121,10 @@ class Bridge:
                     continue
                 if frame:
                     self.ser.write(frame)
+                    print(f"[TX] {frame!r}")
         finally:
             clients.discard(ws)
+            print(f"[WS] 网页客户端断开（当前 {len(clients)} 个）")
 
 def main():
     port = sys.argv[1] if len(sys.argv) > 1 else None

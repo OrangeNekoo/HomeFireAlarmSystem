@@ -2,53 +2,93 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>家庭火灾监测 · 元素感知</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>家庭火灾监测</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header id="topbar">
-  <div class="title">家庭火灾监测 · 元素感知</div>
-  <div id="clock">----.--.-- --:--:--</div>
-  <div id="link-info" class="offline">未连接 · 演示模式</div>
-</header>
-<main>
-  <aside id="node-cards">
-    <div class="node-card" id="card-master">
-      <div class="node-name">主节点 · 协调器</div>
-      <div class="node-state">离线</div>
+<div id="frame">
+
+  <header id="topbar">
+    <div class="banner-text">
+      <div class="banner-title">HOME FIRE ALARM SYSTEM</div>
+      <div class="banner-sub">家庭火灾监测 — 温度、湿度与有害气体，全天候在线监测。</div>
     </div>
-    <div class="node-card" id="card-temp">
-      <div class="node-name">温湿度节点</div>
-      <div class="node-data" id="card-temp-data">-- ℃ / -- %</div>
-      <div class="node-state">离线</div>
+    <div id="buy-sticker">WATCH 24 HRS</div>
+    <div id="demo-badge" hidden>演示模式 DEMO!</div>
+    <div id="link-info" class="offline">未连接 · 演示模式</div>
+  </header>
+
+  <div id="clock-row">
+    <span id="clock">----.--.-- --:--:--</span>
+    <span class="best-view">This console is best viewed at 1280×800 or higher.</span>
+  </div>
+
+  <main>
+    <aside id="left-rail">
+      <div class="node-card" id="card-master">
+        <div class="ribbon-title">NODE 1 — MASTER</div>
+        <div class="ribbon-body steel">
+          <div class="node-name">主节点 · 协调器</div>
+          <div class="node-state">离线</div>
+        </div>
+      </div>
+      <div id="loss-info">丢包率 --</div>
+    </aside>
+
+    <section id="right-col">
+      <div class="eyebrow">REAL-TIME<br>MONITOR · 实时监测</div>
+
+      <div class="node-card metric" id="card-temp">
+        <div class="ribbon-title">NODE 2 — TEMP &amp; HUMIDITY · 温湿度节点</div>
+        <div class="ribbon-body sage">
+          <div class="node-data" id="card-temp-data">-- ℃ / -- %</div>
+          <div class="node-state">离线</div>
+          <div class="readings">
+            <div class="reading"><span class="val" id="v-temp">--</span> ℃ 温度
+              <canvas id="c-temp" width="200" height="40"></canvas></div>
+            <div class="reading"><span class="val" id="v-hum">--</span> % 湿度
+              <canvas id="c-hum" width="200" height="40"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="node-card metric" id="card-gas">
+        <div class="ribbon-title">NODE 3 — HAZARDOUS GAS · 气体节点</div>
+        <div class="ribbon-body salmon">
+          <div class="node-data" id="card-gas-data">ADC --</div>
+          <div class="node-state">离线</div>
+          <div class="readings">
+            <div class="reading"><span class="val" id="v-gas">--</span> ADC 浓度
+              <canvas id="c-gas" width="200" height="40"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="console">
+    <div id="alarm-banner" hidden>⚠ FIRE ALARM · 火灾警报 · 请立即疏散 ⚠</div>
+    <div class="console-row">
+      <label>温度阈值 <input id="th-temp" type="number" min="1" value="45">℃</label>
+      <label>气体阈值 <input id="th-gas" type="number" min="1" value="600"></label>
+      <button id="btn-thresh" class="btn-primary">下发阈值</button>
+      <button id="btn-test" class="btn-secondary">模拟报警</button>
+      <button id="btn-test-off" class="btn-secondary" hidden>解除模拟</button>
     </div>
-    <div class="node-card" id="card-gas">
-      <div class="node-name">有害气体节点</div>
-      <div class="node-data" id="card-gas-data">ADC --</div>
-      <div class="node-state">离线</div>
+    <div class="footer-nav">
+      <span>◉ MONITOR<span class="cn">实时监测</span></span>
+      <span>▣ NODES<span class="cn">传感节点</span></span>
+      <span>◔ HISTORY<span class="cn">历史曲线</span></span>
+      <span>✎ CONTROL<span class="cn">阈值控制</span></span>
     </div>
-  </aside>
-  <section id="stage3d"><div id="demo-badge" hidden>演示模式</div></section>
-  <aside id="data-panel">
-    <div class="metric" id="m-temp"><span class="elem pyro">火</span>
-      <span class="val" id="v-temp">--</span>℃<canvas id="c-temp" width="200" height="40"></canvas></div>
-    <div class="metric" id="m-hum"><span class="elem hydro">水</span>
-      <span class="val" id="v-hum">--</span>%<canvas id="c-hum" width="200" height="40"></canvas></div>
-    <div class="metric" id="m-gas"><span class="elem anemo">风</span>
-      <span class="val" id="v-gas">--</span><canvas id="c-gas" width="200" height="40"></canvas></div>
-    <div id="loss-info">丢包率 --</div>
-  </aside>
-</main>
-<footer id="console">
-  <div id="alarm-banner" hidden>⚠ 火灾警报 ⚠</div>
-  <label>温度阈值 <input id="th-temp" type="number" min="1" value="45">℃</label>
-  <label>气体阈值 <input id="th-gas" type="number" min="1" value="600"></label>
-  <button id="btn-thresh">下发阈值</button>
-  <button id="btn-test">模拟报警</button>
-  <button id="btn-test-off" hidden>解除模拟</button>
-</footer>
-<div id="burst-overlay"></div>
-<script src="three.min.js"></script>
+    <div class="footer-legal">
+      <a href="#">Copyright</a> 2026 HomeFireAlarmSystem · (Terms of Monitoring)<br>
+      本控制台建议使用浏览器版本 3.0 以上查看 · 数据每 2 秒刷新
+    </div>
+  </footer>
+
+</div>
 <script src="main.js"></script>
 </body>
 </html>
