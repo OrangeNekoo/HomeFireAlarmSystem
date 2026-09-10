@@ -25,11 +25,16 @@ node_info_t n2, n3;
 u16 th_temp = 45, th_gas = 600;
 u8  alarm_on = 0, alarm_src = 0, test_on = 0;
 
-static void draw_main_page(void)
+static void draw_time_row(void)
 {
     char b[17];
-    LCD_CLS(); LCD_Invert(0);
-    rtc_fmt(b); LCD_P8x16Str(0, 0, (u8 *)b);
+    rtc_fmt(b);
+    LCD_P8x16Str(0, 0, (u8 *)b);
+}
+
+static void draw_values(void)      /* 局部刷新三行数值，不清屏避免闪烁 */
+{
+    char b[17];
     /* 温度行：温度:xx.x℃ */
     LCD_P16x16Ch(0, 2, 0); LCD_P16x16Ch(16, 2, 2);
     b[0]=':'; b[1]='0'+n2.temp_i/10; b[2]='0'+n2.temp_i%10;
@@ -47,6 +52,12 @@ static void draw_main_page(void)
     if(!n3.online)      { LCD_P16x16Ch(72, 6, 14); LCD_P16x16Ch(88, 6, 15); }  /* 离线 */
     else if(n3.gas_do)  { LCD_P16x16Ch(72, 6, 8);  LCD_P16x16Ch(88, 6, 9);  }  /* 异常 */
     else                { LCD_P16x16Ch(72, 6, 7);  LCD_P16x16Ch(88, 6, 9);  }  /* 正常 */
+}
+static void draw_main_page(void)  /* 整页重画：仅初始化/页面切换时调用 */
+{
+    LCD_CLS(); LCD_Invert(0);
+    draw_time_row();
+    draw_values();
 }
 static void draw_alarm_page(void)
 {
@@ -108,7 +119,7 @@ static void handle_rf(void)               /* 序号连续性统计丢包 */
         if(!n2.online) { n2.online = 1; csv_send_status(2, 1); csv_send_loss(2, n2.loss, n2.total); }
         n2.last_ms = g_ms;
         csv_send_data_th(n2.temp_i, n2.temp_d, n2.hum_i, n2.hum_d);
-        if(!alarm_on) draw_main_page();       /* 数值行刷新（简化为整页重画，OLED 无可感闪烁） */
+        if(!alarm_on) draw_values();          /* 局部刷新数值行，不清屏不闪 */
     }
     else if(cmd == 0x01 && src == 0x03 && n == 4)
     {
@@ -120,15 +131,15 @@ static void handle_rf(void)               /* 序号连续性统计丢包 */
         if(!n3.online) { n3.online = 1; csv_send_status(3, 1); csv_send_loss(3, n3.loss, n3.total); }
         n3.last_ms = g_ms;
         csv_send_data_gas(n3.gas, n3.gas_do);
-        if(!alarm_on) draw_main_page();
+        if(!alarm_on) draw_values();
     }
 }
 static void check_offline(void)              /* 1s 调一次；10s 无心跳判离线 */
 {
     if(n2.online && g_ms - n2.last_ms > 10000)
-    { n2.online = 0; csv_send_status(2, 0); csv_send_loss(2, n2.loss, n2.total); if(!alarm_on) draw_main_page(); }
+    { n2.online = 0; csv_send_status(2, 0); csv_send_loss(2, n2.loss, n2.total); if(!alarm_on) draw_values(); }
     if(n3.online && g_ms - n3.last_ms > 10000)
-    { n3.online = 0; csv_send_status(3, 0); csv_send_loss(3, n3.loss, n3.total); if(!alarm_on) draw_main_page(); }
+    { n3.online = 0; csv_send_status(3, 0); csv_send_loss(3, n3.loss, n3.total); if(!alarm_on) draw_values(); }
 }
 void main(void)
 {
@@ -148,7 +159,7 @@ void main(void)
         {
             u8 r = csv_handle_line();
             if(r == 2) judge_alarm();         /* TEST 置位/复位后立即判决 */
-            else if(r == 3) { broadcast_time(); if(!alarm_on) draw_main_page(); }
+            else if(r == 3) { broadcast_time(); if(!alarm_on) draw_time_row(); }
         }
         handle_rf();
         if(g_ms - last_500 >= 500) { last_500 += 500; judge_alarm(); }
@@ -158,7 +169,7 @@ void main(void)
             rtc_sec_tick();
             check_offline();
             if(alarm_on) LCD_Invert(g_rtc.sec & 1);      /* 报警 1Hz 闪烁 */
-            else if(g_rtc.min != last_min) { last_min = g_rtc.min; draw_main_page(); }
+            else if(g_rtc.min != last_min) { last_min = g_rtc.min; draw_time_row(); }
         }
         if(g_ms - last_60s >= 60000) { last_60s += 60000; broadcast_time(); }
         LED_ALARM = (alarm_on && ((g_ms / 500) & 1)) ? 0 : 1;   /* 500ms 翻转 */
