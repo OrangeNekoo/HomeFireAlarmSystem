@@ -231,10 +231,12 @@ static void handle_rf(void)               /* 序号连续性统计丢包 */
 static void check_offline(void)              /* 1s 调一次；10s 无心跳判离线 */
 {
     u32 now = ms_get();
+    u8 redraw = 0;
     if(n2.online && now - n2.last_ms >= OFFLINE_TIMEOUT_MS)
-    { n2.online = 0; csv_send_status(2, 0); csv_send_loss(2, n2.loss, n2.total); if(!alarm_on && !easter_on) draw_values(); }
+    { n2.online = 0; csv_send_status(2, 0); csv_send_loss(2, n2.loss, n2.total); redraw = 1; }
     if(n3.online && now - n3.last_ms >= OFFLINE_TIMEOUT_MS)
-    { n3.online = 0; csv_send_status(3, 0); csv_send_loss(3, n3.loss, n3.total); if(!alarm_on && !easter_on) draw_values(); }
+    { n3.online = 0; csv_send_status(3, 0); csv_send_loss(3, n3.loss, n3.total); redraw = 1; }
+    if(redraw && !alarm_on && !easter_on) draw_main_page();
 }
 void main(void)
 {

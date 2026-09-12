@@ -24,24 +24,22 @@ def test_master_renders_temperature_node_offline_instead_of_cached_values():
     assert values_block.count("LCD_WrDat(0x00)") >= 2
 
 
-def test_master_offline_path_refreshes_display_even_when_alarm_active():
+def test_master_offline_path_refreshes_entire_screen_once():
     source = (ROOT / "Master/main.c").read_text(encoding="gbk")
     offline_block = source.split("static void check_offline", 1)[1].split("void main", 1)[0]
     assert "csv_send_status(2, 0)" in offline_block
     assert "csv_send_status(3, 0)" in offline_block
     assert "if(!alarm_on) draw_values();" not in offline_block
-    assert "draw_values();" in offline_block
+    assert "draw_main_page();" in offline_block
+    assert "redraw" in offline_block
     assert "now - n2.last_ms >= OFFLINE_TIMEOUT_MS" in offline_block
     assert "now - n3.last_ms >= OFFLINE_TIMEOUT_MS" in offline_block
 
 
-def test_frontend_status_messages_are_not_overridden_by_stale_data():
+def test_frontend_tracks_master_status_from_serial_heartbeat():
     source = (ROOT / "web/main.js").read_text(encoding="utf-8")
-    assert "lastDataTs" in source
-    assert "OFFLINE_TIMEOUT_MS" in source
-    assert "setInterval(checkNodeFreshness" in source
-    assert "!node.offlineByStatus" in source
-    assert "offlineByStatus = !m.online" in source
-    assert 'querySelector(".node-state").textContent' in source
-    assert 'n2.online ? "状态：ONLINE" : "状态：OFFLINE"' in source
-    assert 'n3.online ? "状态：ONLINE" : "状态：OFFLINE"' in source
+    assert "master: { online: false }" in source
+    assert "state.master.online = m.online" in source
+    assert '$("card-master").querySelector(".node-state").textContent' in source
+    assert "state.master.online = true" in source
+    assert "state.master.online = false" in source

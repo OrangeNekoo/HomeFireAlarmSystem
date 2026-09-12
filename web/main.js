@@ -4,6 +4,7 @@ const state = {
     2: { online: false, temp: null, hum: null, lastDataTs: 0, offlineByStatus: false },
     3: { online: false, gas: null, do: null, lastDataTs: 0, offlineByStatus: false },
   },
+  master: { online: false },
   alarm: { on: false, src: 0 },
   hist: { temp: [], hum: [], gas: [] },
   demo: false,
@@ -83,13 +84,15 @@ function connectWS() {
   ws.onopen = () => {
     clearInterval(wsTimer);
     linkEl.textContent = "已连接"; linkEl.className = "online";
-    $("card-master").classList.add("online");
+    state.master.online = true;
+    render();
     if (state.demo) exitDemo();
     ws.send(JSON.stringify({ type: "setTime" }));   // 连上即对时
   };
   ws.onmessage = e => handleMsg(JSON.parse(e.data));
   ws.onclose = () => { linkEl.textContent = "未连接 · 演示模式"; linkEl.className = "offline";
-    $("card-master").classList.remove("online");
+    state.master.online = false;
+    render();
     wsTimer = setTimeout(connectWS, 3000); };
 }
 function sendCmd(obj) {
@@ -111,6 +114,7 @@ function handleMsg(m) {
     if (!state.demo || !node.offlineByStatus) node.online = true;
     pushHist("gas", m.gas);
   }
+  if (m.type === "status" && m.node === 1) state.master.online = m.online;
   if (m.type === "status" && state.nodes[m.node]) {
     state.nodes[m.node].online = m.online;
     state.nodes[m.node].offlineByStatus = !m.online;
@@ -169,6 +173,8 @@ function drawCurve(canvas, arr, color) {
 }
 function render() {
   const n2 = state.nodes[2], n3 = state.nodes[3];
+  $("card-master").classList.toggle("online", state.master.online);
+  $("card-master").querySelector(".node-state").textContent = state.master.online ? "状态：ONLINE" : "状态：OFFLINE";
   $("card-temp").classList.toggle("online", n2.online);
   $("card-temp").querySelector(".node-state").textContent = n2.online ? "状态：ONLINE" : "状态：OFFLINE";
   $("card-temp-data").textContent = n2.online ? `${n2.temp} ℃ / ${n2.hum} %` : "-- ℃ / -- %";
