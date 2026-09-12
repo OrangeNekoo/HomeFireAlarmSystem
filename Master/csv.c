@@ -59,6 +59,13 @@ void csv_send_alarm(u8 on, u8 src)
     b[i++] = 'A'; b[i++] = ','; b[i++] = '0' + on; b[i++] = ','; b[i++] = '0' + src; b[i] = '\0';
     csv_send_body(b);
 }
+void csv_send_easter(u8 on)
+{
+    char b[4];
+    if(on) strcpy(b, "E,1");
+    else strcpy(b, "E,0");
+    csv_send_body(b);
+}
 void csv_send_loss(u8 node, u16 lost, u16 total)
 {
     char b[24], n[6]; u8 i = 0, k, j;

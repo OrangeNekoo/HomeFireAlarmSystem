@@ -65,6 +65,29 @@ void LCD_Invert(unsigned char on)
 {
     LCD_WrCmd(on ? 0xA7 : 0xA6);
 }
+/*********************绘制居中64x64逐行位图*********************/
+void LCD_DrawBitmap64(const unsigned char __code *bitmap)
+{
+    unsigned char page, column, row, bit;
+    unsigned char page_data;
+
+    LCD_CLS();
+    for(page = 0; page < 8; page++)
+    {
+        LCD_Set_Pos(32, page);
+        for(column = 0; column < 64; column++)
+        {
+            page_data = 0;
+            for(bit = 0; bit < 8; bit++)
+            {
+                row = (unsigned char)(page * 8 + bit);
+                if(bitmap[(unsigned int)row * 8 + (column >> 3)] & (unsigned char)(0x80 >> (column & 0x07)))
+                    page_data |= (unsigned char)(1 << bit);
+            }
+            LCD_WrDat(page_data);
+        }
+    }
+}
 /*********************LCD初始化（照示例代码）********************/
 void LCD_Init(void)
 {

@@ -11,4 +11,5 @@ __pycache__/
 *.dbgdt
 *.dni
 *.wsdt
-/.playwright-cli
+/.playwright-cli/
+.superpowers/

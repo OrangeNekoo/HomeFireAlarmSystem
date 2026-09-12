@@ -50,6 +50,8 @@ def parse_line(line: str):
                     "lost": int(f[2]), "total": int(f[3])}
         if f[0] == "T" and len(f) == 3:
             return {"type": "threshold", "temp": int(f[1]), "gas": int(f[2])}
+        if f[0] == "E" and len(f) == 2 and f[1] in ("0", "1"):
+            return {"type": "easterEgg", "on": f[1] == "1"}
     except (ValueError, IndexError):
         return None
     return None

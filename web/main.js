@@ -7,10 +7,73 @@ const state = {
   alarm: { on: false, src: 0 },
   hist: { temp: [], hum: [], gas: [] },
   demo: false,
+  easterEgg: false,
 };
 
 const $ = id => document.getElementById(id);
+const EASTER_FRAME_ORDER = [1, 2, 3, 4, 6, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+  16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30];
+const EASTER_FRAME_MANIFEST = [
+  "easter/128_64/frame-1.jpg", "easter/128_64/frame-2.jpg",
+  "easter/128_64/frame-3.jpg", "easter/128_64/frame-4.jpg",
+  "easter/128_64/frame-6.jpg", "easter/128_64/frame-5.jpg",
+  "easter/128_64/frame-7.jpg", "easter/128_64/frame-8.jpg",
+  "easter/128_64/frame-9.jpg", "easter/128_64/frame-10.jpg",
+  "easter/128_64/frame-11.jpg", "easter/128_64/frame-12.jpg",
+  "easter/128_64/frame-13.jpg", "easter/128_64/frame-14.jpg",
+  "easter/128_64/frame-15.jpg", "easter/128_64/frame-16.jpg",
+  "easter/128_64/frame-17.jpg", "easter/128_64/frame-18.jpg",
+  "easter/128_64/frame-19.jpg", "easter/128_64/frame-20.jpg",
+  "easter/128_64/frame-21.jpg", "easter/128_64/frame-22.jpg",
+  "easter/128_64/frame-23.jpg", "easter/128_64/frame-24.jpg",
+  "easter/128_64/frame-25.jpg", "easter/128_64/frame-26.jpg",
+  "easter/128_64/frame-27.jpg", "easter/128_64/frame-28.jpg",
+  "easter/128_64/frame-29.jpg", "easter/128_64/frame-30.jpg",
+];
+const easterOverlay = $("easter-overlay"), easterFrame = $("easter-frame");
+const audio = $("easter-audio");
+const easterAudioButton = $("easter-enable-audio");
+let easterTimer = null, easterIndex = 0;
 const clockEl = $("clock"), linkEl = $("link-info");
+
+function easterFramePath(index) { return EASTER_FRAME_MANIFEST[index]; }
+function preloadEasterFrames() {
+  EASTER_FRAME_MANIFEST.forEach(path => { const image = new Image(); image.src = path; });
+}
+function playEasterAudio() {
+  audio.play().then(() => {
+    easterAudioButton.hidden = true;
+  }).catch(() => {
+    easterAudioButton.hidden = false;
+  });
+}
+function setEaster(on) {
+  on = Boolean(on);
+  if (state.easterEgg === on) return;
+  state.easterEgg = on;
+  if (on) {
+    easterIndex = 0;
+    easterOverlay.hidden = false;
+    preloadEasterFrames();
+    easterFrame.src = easterFramePath(easterIndex);
+    clearInterval(easterTimer);
+    easterTimer = setInterval(() => {
+      easterIndex = (easterIndex + 1) % EASTER_FRAME_MANIFEST.length;
+      easterFrame.src = easterFramePath(easterIndex);
+    }, 100);
+    audio.loop = true;
+    playEasterAudio();
+  } else {
+    clearInterval(easterTimer);
+    easterTimer = null;
+    easterOverlay.hidden = true;
+    audio.pause();
+    audio.currentTime = 0;
+    easterAudioButton.hidden = true;
+    render();
+  }
+}
+easterAudioButton.onclick = playEasterAudio;
 
 /* ---------- WebSocket ---------- */
 let ws = null, wsTimer = null;
@@ -41,6 +104,7 @@ function handleMsg(m) {
     pushHist("gas", m.gas); }
   if (m.type === "status" && state.nodes[m.node]) { state.nodes[m.node].online = m.online; }
   if (m.type === "alarm") state.alarm = { on: m.on, src: m.src };
+  if (m.type === "easterEgg") setEaster(m.on);
   if (m.type === "threshold") { $("th-temp").value = m.temp; $("th-gas").value = m.gas; }
   render();
 }

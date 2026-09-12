@@ -7,6 +7,7 @@ void csv_send_data_th(u8 ti, u8 td, u8 hi, u8 hd);          /* D,2,… */
 void csv_send_data_gas(u16 adc, u8 do_hit);                 /* D,3,… */
 void csv_send_status(u8 node, u8 online);                   /* S,2,ONLINE */
 void csv_send_alarm(u8 on, u8 src);                         /* A,1,2 */
+void csv_send_easter(u8 on);                                /* E,1/E,0 */
 void csv_send_loss(u8 node, u16 lost, u16 total);           /* L,2,3,128 */
 void csv_send_thresh(u16 t, u16 g);                         /* T,45,600 */
 /* 下行解析：uart_line 匹配 SET/TEST/TIME，成功返回 1（SET）/2（TEST）/3（TIME），

@@ -32,6 +32,8 @@ class TestParseLine(unittest.TestCase):
         with open("Master/csv.c", encoding="gbk") as source:
             csv_source = source.read()
         self.assertNotIn("while(k) b[i++] = n[--k];", csv_source)
+        self.assertIn('strcpy(b, "E,1")', csv_source)
+        self.assertIn('strcpy(b, "E,0")', csv_source)
 
         self.assertEqual(parse_line("S,2,ONLINE*6E"),
                          {"type": "status", "node": 2, "online": True})
@@ -49,6 +51,18 @@ class TestParseLine(unittest.TestCase):
         self.assertIsNone(parse_line("D,2,25,0,61,0*FF"))
         self.assertIsNone(parse_line("D,2,25,0,61,0"))
         self.assertIsNone(parse_line("GARBAGE*00"))
+
+    def test_parse_easter_start_and_stop(self):
+        for on in (0, 1):
+            body = f"E,{on}"
+            self.assertEqual(parse_line(body + "*" + xor_cs(body)),
+                             {"type": "easterEgg", "on": bool(on)})
+
+    def test_bad_easter_payload_is_rejected(self):
+        for body in ("E,2", "E,-1", "E,01", "E", "E,1,extra"):
+            self.assertIsNone(parse_line(body + "*" + xor_cs(body)))
+        body = "E,1"
+        self.assertIsNone(parse_line(body + "*00"))
 
 class TestFrontend(unittest.TestCase):
     def test_simulation_button_only_shows_for_simulated_alarm(self):
@@ -85,6 +99,7 @@ class TestBuildDownlink(unittest.TestCase):
                              b"TIME,26,9,8,16,30,0*24\r\n")
     def test_unknown_rejected(self):
         self.assertIsNone(build_downlink({"type": "nonsense"}))
+        self.assertIsNone(build_downlink({"type": "easterEgg", "on": True}))
     def test_malformed_raises(self):
         # 畸形输入会抛异常（防护在 bridge.ws_handler 层捕获后 continue），
         # 此处断言 build_downlink 本身抛出，防止未来改成静默返回导致防护失效

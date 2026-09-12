@@ -8,12 +8,16 @@
 #include "..\Common\frame.h"
 #include "..\Common\rf.h"
 #include "adc.h"
+#include "..\Common\easter_frames.h"
 #define NODE_ID 0x03
 #define LED_ALARM P1_0                /* ºËÐÄ°å LED1£¬µÍµçÆ½µãÁÁ */
 #define MQ2_DO P0_5                   /* DO£º³¬Ä£¿éµçÎ»Æ÷ãÐÖµÎªµÍ */
 
 static u8  page_alarm = 0;            /* 1=»ðÔÖ¾¯±¨Ò³ */
 static u16 gas_avg = 0;               /* »¬¶¯Æ½¾ùºóµÄ ADC Å¨¶ÈÖµ */
+static u8 easter_on = 0;
+static u8 easter_frame = 0;
+static u32 easter_next_ms = 0;
 
 static void draw_time_row(void)       /* Óë TempNode ÏàÍ¬ÊµÏÖ */
 {
@@ -63,6 +67,13 @@ static void draw_main_page(void)
     draw_time_row();
     draw_data_rows();
 }
+static void easter_tick(u32 now)
+{
+    if(!easter_on || now < easter_next_ms) return;
+    LCD_DrawBitmap64(easter_frames[easter_frame]);
+    easter_frame = (easter_frame + 1) % 30;
+    easter_next_ms = now + 100;
+}
 static void send_report(void)         /* ÉÏ±¨Ö¡ [seq,adc_hi,adc_lo,do] 4B -> Ö÷½Úµã */
 {
     u8 d[4], buf[FRAME_MAX_LEN], n;
@@ -83,12 +94,37 @@ static void handle_rf(void)           /* Óë TempNode ÏàÍ¬£º0x02 ¶ÔÊ±¡¢0x03 ±¨¾¯Ò
     if(cmd == 0x02 && n == 6)                 /* ¶ÔÊ±¹ã²¥ */
     {
         rtc_set(out);
-        if(!page_alarm) draw_time_row();
+        if(!page_alarm && !easter_on) draw_time_row();
     }
     else if(cmd == 0x03 && n == 2)            /* ±¨¾¯×´Ì¬¹ã²¥ */
     {
-        if((out[0] & 0x01) && !page_alarm) { page_alarm = 1; draw_alarm_page(); }
-        else if(!(out[0] & 0x01) && page_alarm) { page_alarm = 0; draw_main_page(); }
+        u8 new_page_alarm = (out[0] & 0x01) ? 1 : 0;
+        if(new_page_alarm != page_alarm)
+        {
+            page_alarm = new_page_alarm;
+            if(!easter_on)
+            {
+                if(page_alarm) draw_alarm_page();
+                else draw_main_page();
+            }
+        }
+    }
+    else if(cmd == 0x04 && n == 1)            /* ²Êµ°²¥·Å×´Ì¬¹ã²¥ */
+    {
+        if((out[0] & 0x01) && !easter_on)
+        {
+            easter_on = 1;
+            easter_frame = 0;
+            LCD_CLS();
+            LCD_DrawBitmap64(easter_frames[easter_frame]);
+            easter_next_ms = ms_get() + 100;
+        }
+        else if(!(out[0] & 0x01) && easter_on)
+        {
+            easter_on = 0;
+            if(page_alarm) draw_alarm_page();
+            else draw_main_page();
+        }
     }
 }
 void main(void)
@@ -110,14 +146,14 @@ void main(void)
         {
             last_1s = (now - last_1s > 5000) ? now : last_1s + 1000;   /* ¿¨¶Ù¹ý¾ÃÖ±½Ó¶ÔÆë·ÀÁ¬Ìø */
             rtc_sec_tick();
-            if(page_alarm) LCD_Invert(g_rtc.sec & 1);   /* ±¨¾¯Ò³ 1Hz ·´ÏÔÉÁË¸ */
+            if(!easter_on && page_alarm) LCD_Invert(g_rtc.sec & 1);   /* ±¨¾¯Ò³ 1Hz ·´ÏÔÉÁË¸ */
             else if(warmup)
             {
                 warmup--;
-                if(warmup) draw_warmup(warmup);           /* Ã¿Ãë -1 µ¹¼ÆÊ± */
-                else draw_main_page();                    /* Ô¤ÈÈ½áÊø½øÖ÷Ò³Ãæ */
+                if(warmup && !easter_on) draw_warmup(warmup);           /* Ã¿Ãë -1 µ¹¼ÆÊ± */
+                else if(!warmup && !easter_on) draw_main_page();        /* Ô¤ÈÈ½áÊø½øÖ÷Ò³Ãæ */
             }
-            else if(g_rtc.min != last_min) { last_min = g_rtc.min; draw_time_row(); }
+            else if(!easter_on && g_rtc.min != last_min) { last_min = g_rtc.min; draw_time_row(); }
         }
         if(now - last_2s >= 2000)
         {
@@ -126,10 +162,11 @@ void main(void)
             if(!warmup)
             {
                 send_report();              /* Êý¾Ý°ü¼´ÐÄÌø */
-                if(!page_alarm) draw_data_rows();   /* ADC ÖµÃ¿ 2s Ë¢ÐÂ */
+                if(!page_alarm && !easter_on) draw_data_rows();   /* ADC ÖµÃ¿ 2s Ë¢ÐÂ */
             }
         }
         handle_rf();
+        easter_tick(now);
         LED_ALARM = (page_alarm && ((now / 500) & 1)) ? 0 : 1;   /* 500ms ·­×ª */
     }
 }

@@ -11,5 +11,6 @@ void LCD_P6x8Str(unsigned char x, unsigned char y, unsigned char ch[]);   /* 6x8
 void LCD_P8x16Str(unsigned char x, unsigned char y, unsigned char ch[]);  /* 8x16 ASCII 字符串 */
 void LCD_P16x16Ch(unsigned char x, unsigned char y, unsigned char N);     /* 16x16 汉字，N=字库索引 */
 void LCD_Invert(unsigned char on);                          /* 反显开关（1=反显 0=正常） */
+void LCD_DrawBitmap64(const unsigned char __code *bitmap);    /* 居中绘制逐行 MSB-first 64x64 位图 */
 
 #endif /* OLED_H */

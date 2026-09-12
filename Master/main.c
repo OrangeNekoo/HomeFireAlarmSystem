@@ -7,9 +7,14 @@
 #include "..\Common\rtc.h"
 #include "..\Common\frame.h"
 #include "..\Common\rf.h"
+#include "..\Common\easter_frames.h"
 #include "..\Common\uart.h"
 #include "csv.h"
 #define NODE_ID 0x01
+#define EASTER_BUTTON P0_1
+#define EASTER_BUTTON_SAMPLE_MS 10
+#define EASTER_BUTTON_DEBOUNCE_MS 30
+#define EASTER_FRAME_MS 100
 #define LED_ALARM P0_5                   /* µÕµÁ∆Ωµ„¡¡ */
 
 typedef struct {
@@ -24,6 +29,12 @@ typedef struct {
 node_info_t n2, n3;
 u16 th_temp = 45, th_gas = 600;
 u8  alarm_on = 0, alarm_src = 0, test_on = 0;
+static u8 easter_on = 0;
+static u8 easter_frame = 0;
+static u32 easter_next_ms = 0;
+static u8 easter_button_state = 1;
+static u8 easter_button_sample = 1;
+static u8 easter_button_stable_ms = 0;
 
 static void draw_time_row(void)
 {
@@ -66,6 +77,64 @@ static void draw_alarm_page(void)
     LCD_P16x16Ch(64, 3, 12); LCD_P16x16Ch(80, 3, 13);   /* ª‘÷æØ±® æ”÷– */
     LCD_Invert(1);
 }
+static void easter_broadcast(u8 on)
+{
+    u8 state = on, buf[FRAME_MAX_LEN], n;
+    n = frame_pack(buf, NODE_ID, 0xFF, 0x04, &state, 1);
+    if(n) RF_Send(buf, n);
+    csv_send_easter(on);
+}
+static void easter_set(u8 on)
+{
+    easter_on = on;
+    if(on)
+    {
+        easter_frame = 0;
+        LCD_Invert(0);
+        LCD_DrawBitmap64(easter_frames[easter_frame]);
+        easter_next_ms = ms_get() + EASTER_FRAME_MS;
+    }
+    else if(alarm_on) draw_alarm_page();
+    else draw_main_page();
+    easter_broadcast(on);
+}
+static void easter_tick(u32 now)
+{
+    if(!easter_on || (long)(now - easter_next_ms) < 0) return;
+    easter_frame++;
+    if(easter_frame >= EASTER_FRAME_COUNT) easter_frame = 0;
+    LCD_DrawBitmap64(easter_frames[easter_frame]);
+    easter_next_ms += EASTER_FRAME_MS;
+}
+static void easter_button_init(void)
+{
+    P0SEL &= ~0x02;
+    P0DIR &= ~0x02;
+    P0INP &= ~0x02;
+    P2INP &= ~0x20;                /* P0  ‰»Î∆Ù”√ƒ⁄≤ø…œ¿≠ */
+    easter_button_state = EASTER_BUTTON ? 1 : 0;
+    easter_button_sample = easter_button_state;
+}
+static void easter_button_poll(void)
+{
+    u8 sample = EASTER_BUTTON ? 1 : 0;
+    if(sample == easter_button_sample)
+    {
+        if(easter_button_stable_ms < EASTER_BUTTON_DEBOUNCE_MS)
+            easter_button_stable_ms += EASTER_BUTTON_SAMPLE_MS;
+        if(easter_button_stable_ms >= EASTER_BUTTON_DEBOUNCE_MS &&
+           easter_button_state != sample)
+        {
+            if(easter_button_state == 1 && sample == 0) easter_set(!easter_on);
+            easter_button_state = sample;
+        }
+    }
+    else
+    {
+        easter_button_sample = sample;
+        easter_button_stable_ms = EASTER_BUTTON_SAMPLE_MS;
+    }
+}
 static void broadcast_time(void)          /* π„≤•∂‘ ±£∫cmd 0x02°¢dst 0xFF°¢”Ú [ƒÍ-2000,‘¬,»’, ±,∑÷,√Î] */
 {
     u8 d[6], buf[FRAME_MAX_LEN], n;
@@ -79,7 +148,10 @@ static void set_alarm(u8 on, u8 src)      /* “≥√Ê«–ªª + RF π„≤• + ¥Æø⁄…œ±® »˝¡™∂
     u8 d[2], buf[FRAME_MAX_LEN], n;
     alarm_on = on; alarm_src = src;
     if(!on) test_on = 0;
-    if(on) draw_alarm_page(); else draw_main_page();
+    if(!easter_on)
+    {
+        if(on) draw_alarm_page(); else draw_main_page();
+    }
     d[0] = on; d[1] = src;
     n = frame_pack(buf, NODE_ID, 0xFF, 0x03, d, 2);
     RF_Send(buf, n);
@@ -119,7 +191,7 @@ static void handle_rf(void)               /* –Ú∫≈¡¨–¯–‘Õ≥º∆∂™∞¸ */
         if(!n2.online) { n2.online = 1; csv_send_status(2, 1); csv_send_loss(2, n2.loss, n2.total); }
         n2.last_ms = ms_get();
         csv_send_data_th(n2.temp_i, n2.temp_d, n2.hum_i, n2.hum_d);
-        if(!alarm_on) draw_values();          /* æ÷≤øÀ¢–¬ ˝÷µ––£¨≤ª«Â∆¡≤ª…¡ */
+        if(!alarm_on && !easter_on) draw_values();          /* æ÷≤øÀ¢–¬ ˝÷µ––£¨≤ª«Â∆¡≤ª…¡ */
     }
     else if(cmd == 0x01 && src == 0x03 && n == 4)
     {
@@ -131,7 +203,7 @@ static void handle_rf(void)               /* –Ú∫≈¡¨–¯–‘Õ≥º∆∂™∞¸ */
         if(!n3.online) { n3.online = 1; csv_send_status(3, 1); csv_send_loss(3, n3.loss, n3.total); }
         n3.last_ms = ms_get();
         csv_send_data_gas(n3.gas, n3.gas_do);
-        if(!alarm_on) draw_values();
+        if(!alarm_on && !easter_on) draw_values();
     }
 }
 static void check_offline(void)              /* 1s µ˜“ª¥Œ£ª10s Œﬁ–ƒÃ¯≈–¿Îœﬂ */
@@ -144,24 +216,31 @@ static void check_offline(void)              /* 1s µ˜“ª¥Œ£ª10s Œﬁ–ƒÃ¯≈–¿Îœﬂ */
 }
 void main(void)
 {
-    u32 last_500 = 0, last_1s = 0, last_10s = 0;
+    u32 last_500 = 0, last_1s = 0, last_10s = 0, last_button = 0;
     u8  last_min = 0xFF;
     CLK_Init();
     T1_Init();
     RF_Init();
     UART_Init();
     P0SEL &= ~0x20; P0DIR |= 0x20; LED_ALARM = 1;
+    easter_button_init();
     LCD_Init(); LCD_CLS();
     draw_main_page();
     csv_send_thresh(th_temp, th_gas);        /* …œœﬂ∏Ê÷™…œŒªª˙µ±«∞„–÷µ */
     while(1)
     {
         u32 now = ms_get();               /* √ø»¶»°“ª¥Œ‘≠◊” ±º‰£¨»¶ƒ⁄π≤”√ */
+        if(now - last_button >= EASTER_BUTTON_SAMPLE_MS)
+        {
+            last_button += EASTER_BUTTON_SAMPLE_MS;
+            easter_button_poll();
+        }
+        easter_tick(now);
         if(uart_line_ready)
         {
             u8 r = csv_handle_line();
             if(r == 2) judge_alarm();         /* TEST ÷√Œª/∏¥Œª∫Û¡¢º¥≈–æˆ */
-            else if(r == 3) { broadcast_time(); if(!alarm_on) draw_time_row(); }
+            else if(r == 3) { broadcast_time(); if(!alarm_on && !easter_on) draw_time_row(); }
         }
         handle_rf();
         if(now - last_500 >= 500) { last_500 += 500; judge_alarm(); }
@@ -171,8 +250,8 @@ void main(void)
             last_1s = (now - last_1s > 5000) ? now : last_1s + 1000;
             rtc_sec_tick();
             check_offline();
-            if(alarm_on) LCD_Invert(g_rtc.sec & 1);      /* ±®æØ 1Hz …¡À∏ */
-            else if(g_rtc.min != last_min) { last_min = g_rtc.min; draw_time_row(); }
+            if(alarm_on && !easter_on) LCD_Invert(g_rtc.sec & 1);      /* ±®æØ 1Hz …¡À∏ */
+            else if(!easter_on && g_rtc.min != last_min) { last_min = g_rtc.min; draw_time_row(); }
         }
         if(now - last_10s >= 10000)
         {

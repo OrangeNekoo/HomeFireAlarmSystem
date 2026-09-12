@@ -81,7 +81,7 @@
         </option>
         <option>
           <name>Constant Placement</name>
-          <state>0</state>
+          <state>2</state>
         </option>
         <option>
           <name>Datapointer Size</name>
@@ -1112,7 +1112,7 @@
         </option>
         <option>
           <name>Constant Placement</name>
-          <state>0</state>
+          <state>2</state>
         </option>
         <option>
           <name>Datapointer Size</name>
@@ -2081,6 +2081,9 @@
   </file>
   <file>
     <name>$PROJ_DIR$\main.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\..\Common\easter_frames.c</name>
   </file>
   <file>
     <name>$PROJ_DIR$\..\Common\oled.c</name>

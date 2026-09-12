@@ -2083,6 +2083,9 @@
     <name>$PROJ_DIR$\main.c</name>
   </file>
   <file>
+    <name>$PROJ_DIR$\..\Common\easter_frames.c</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\..\Common\oled.c</name>
   </file>
   <file>
