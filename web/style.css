@@ -98,8 +98,6 @@ button { font-family: var(--sans); font-weight: 700; font-size: 12px;
   border-top: 1px solid var(--sage); padding-top: 8px; margin-top: 4px; }
 .footer-nav span { font-family: var(--sans); font-weight: 700; font-size: 12px; padding: 8px; }
 .footer-nav .cn { display: block; font-family: var(--serif); font-weight: 400; }
-.footer-legal { text-align: center; font-size: 11px; padding-top: 8px; }
-.footer-legal a { color: var(--link); text-decoration: underline; }
 
 @keyframes blink { from { opacity: 1; } to { opacity: .35; } }
 

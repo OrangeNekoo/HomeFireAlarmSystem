@@ -50,6 +50,22 @@ class TestParseLine(unittest.TestCase):
         self.assertIsNone(parse_line("D,2,25,0,61,0"))
         self.assertIsNone(parse_line("GARBAGE*00"))
 
+class TestFrontend(unittest.TestCase):
+    def test_simulation_button_only_shows_for_simulated_alarm(self):
+        with open("web/main.js", encoding="utf-8") as source:
+            main_js = source.read()
+        self.assertIn(
+            '$("btn-test-off").hidden = !(state.alarm.on && state.alarm.src === 3);',
+            main_js,
+        )
+
+    def test_footer_legal_notice_removed(self):
+        with open("web/index.html", encoding="utf-8") as source:
+            index_html = source.read()
+        self.assertNotIn('class="footer-legal"', index_html)
+        self.assertNotIn("Copyright 2026 HomeFireAlarmSystem", index_html)
+
+
 class TestBuildDownlink(unittest.TestCase):
     def test_set_threshold(self):
         self.assertEqual(build_downlink({"type": "setThreshold", "temp": 50, "gas": 700}),

@@ -92,7 +92,7 @@ function render() {
   drawCurve($("c-hum"), state.hist.hum, getComputedStyle(document.body).getPropertyValue("--hydro"));
   drawCurve($("c-gas"), state.hist.gas, getComputedStyle(document.body).getPropertyValue("--anemo"));
   $("alarm-banner").hidden = !state.alarm.on;
-  $("btn-test-off").hidden = !state.alarm.on;
+  $("btn-test-off").hidden = !(state.alarm.on && state.alarm.src === 3);
   document.querySelectorAll(".node-card").forEach(c => c.classList.remove("alarm"));
   if (state.alarm.on) { $("card-temp").classList.add("alarm"); $("card-gas").classList.add("alarm"); }
   onAlarmFx(state.alarm.on);          // 任务 12 实现；本任务先提供空函数
