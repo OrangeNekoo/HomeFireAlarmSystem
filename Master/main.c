@@ -47,11 +47,17 @@ static void draw_time_row(void)
 static void draw_values(void)      /* 局部刷新三行数值，不清屏避免闪烁 */
 {
     char b[17];
+    u8 i;
     /* 温度行：温度:xx.x℃，节点2离线时显示离线 */
     LCD_P16x16Ch(0, 2, 0); LCD_P16x16Ch(16, 2, 2);
     if(!n2.online)
     {
-        LCD_P16x16Ch(32, 2, 14); LCD_P16x16Ch(48, 2, 15);
+        LCD_Set_Pos(32, 2);
+        for(i = 0; i < 64; i++) LCD_WrDat(0x00);
+        LCD_Set_Pos(32, 4);
+        for(i = 0; i < 64; i++) LCD_WrDat(0x00);
+        LCD_P8x16Str(32, 2, (u8 *)":");
+        LCD_P16x16Ch(40, 2, 14); LCD_P16x16Ch(56, 2, 15);
     }
     else
     {
@@ -63,7 +69,8 @@ static void draw_values(void)      /* 局部刷新三行数值，不清屏避免闪烁 */
     LCD_P16x16Ch(0, 4, 1); LCD_P16x16Ch(16, 4, 2);
     if(!n2.online)
     {
-        LCD_P16x16Ch(32, 4, 14); LCD_P16x16Ch(48, 4, 15);
+        LCD_P8x16Str(32, 4, (u8 *)":");
+        LCD_P16x16Ch(40, 4, 14); LCD_P16x16Ch(56, 4, 15);
     }
     else
     {

@@ -15,8 +15,13 @@ def test_master_renders_temperature_node_offline_instead_of_cached_values():
     source = (ROOT / "Master/main.c").read_text(encoding="gbk")
     values_block = source.split("static void draw_values", 1)[1].split("static void draw_main_page", 1)[0]
     assert "if(!n2.online)" in values_block
-    assert "LCD_P16x16Ch(32, 2, 14)" in values_block
-    assert "LCD_P16x16Ch(48, 2, 15)" in values_block
+    assert "LCD_P8x16Str(32, 2, (u8 *)\":\")" in values_block
+    assert "LCD_P8x16Str(32, 4, (u8 *)\":\")" in values_block
+    assert "LCD_P16x16Ch(40, 2, 14)" in values_block
+    assert "LCD_P16x16Ch(56, 2, 15)" in values_block
+    assert "LCD_P16x16Ch(40, 4, 14)" in values_block
+    assert "LCD_P16x16Ch(56, 4, 15)" in values_block
+    assert values_block.count("LCD_WrDat(0x00)") >= 2
 
 
 def test_master_offline_path_refreshes_display_even_when_alarm_active():
