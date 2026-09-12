@@ -38,10 +38,10 @@ void csv_send_data_th(u8 ti, u8 td, u8 hi, u8 hd)
 }
 void csv_send_data_gas(u16 adc, u8 do_hit)
 {
-    char b[20], n[5]; u8 i = 0, k;
+    char b[20], n[5]; u8 i = 0, k, j;
     strcpy(b, "D,3,"); i = 4;
     k = u16_to_str(adc, n);
-    while(k) b[i++] = n[--k];
+    for(j = 0; j < k; j++) b[i++] = n[j];
     b[i++] = ',';
     b[i++] = '0' + do_hit; b[i] = '\0';
     csv_send_body(b);
@@ -61,21 +61,21 @@ void csv_send_alarm(u8 on, u8 src)
 }
 void csv_send_loss(u8 node, u16 lost, u16 total)
 {
-    char b[24], n[6]; u8 i = 0, k;
+    char b[24], n[6]; u8 i = 0, k, j;
     b[i++] = 'L'; b[i++] = ','; b[i++] = '0' + node; b[i++] = ',';
-    k = u16_to_str(lost, n);  while(k) b[i++] = n[--k];
+    k = u16_to_str(lost, n);  for(j = 0; j < k; j++) b[i++] = n[j];
     b[i++] = ',';
-    k = u16_to_str(total, n); while(k) b[i++] = n[--k];
+    k = u16_to_str(total, n); for(j = 0; j < k; j++) b[i++] = n[j];
     b[i] = '\0';
     csv_send_body(b);
 }
 void csv_send_thresh(u16 t, u16 g)
 {
-    char b[20], n[6]; u8 i = 0, k;
+    char b[20], n[6]; u8 i = 0, k, j;
     strcpy(b, "T,"); i = 2;
-    k = u16_to_str(t, n); while(k) b[i++] = n[--k];
+    k = u16_to_str(t, n); for(j = 0; j < k; j++) b[i++] = n[j];
     b[i++] = ',';
-    k = u16_to_str(g, n); while(k) b[i++] = n[--k];
+    k = u16_to_str(g, n); for(j = 0; j < k; j++) b[i++] = n[j];
     b[i] = '\0';
     csv_send_body(b);
 }

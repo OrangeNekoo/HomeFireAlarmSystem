@@ -19,10 +19,20 @@ class TestParseLine(unittest.TestCase):
     def test_data_temp(self):
         self.assertEqual(parse_line("D,2,25,0,61,0*5A"),
                          {"type": "data", "node": 2, "temp": 25.0, "hum": 61.0})
-    def test_data_gas(self):
-        self.assertEqual(parse_line("D,3,812,1*51"),
-                         {"type": "data", "node": 3, "gas": 812, "do": 1})
-    def test_status(self):
+    def test_data_gas_keeps_three_digit_order(self):
+        self.assertEqual(parse_line("D,3,527,1*" + xor_cs("D,3,527,1")),
+                         {"type": "data", "node": 3, "gas": 527, "do": 1})
+
+    def test_threshold_keeps_three_digit_order(self):
+        body = "T,45,600"
+        self.assertEqual(parse_line(body + "*" + xor_cs(body)),
+                         {"type": "threshold", "temp": 45, "gas": 600})
+
+    def test_master_serializers_do_not_reverse_digits(self):
+        with open("Master/csv.c", encoding="gbk") as source:
+            csv_source = source.read()
+        self.assertNotIn("while(k) b[i++] = n[--k];", csv_source)
+
         self.assertEqual(parse_line("S,2,ONLINE*6E"),
                          {"type": "status", "node": 2, "online": True})
         self.assertEqual(parse_line("S,3,OFFLINE*21"),

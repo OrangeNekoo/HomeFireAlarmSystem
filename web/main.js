@@ -5,7 +5,6 @@ const state = {
     3: { online: false, gas: null, do: null },
   },
   alarm: { on: false, src: 0 },
-  loss: {},                    // node -> {lost, total}
   hist: { temp: [], hum: [], gas: [] },
   demo: false,
 };
@@ -42,7 +41,6 @@ function handleMsg(m) {
     pushHist("gas", m.gas); }
   if (m.type === "status" && state.nodes[m.node]) { state.nodes[m.node].online = m.online; }
   if (m.type === "alarm") state.alarm = { on: m.on, src: m.src };
-  if (m.type === "loss") state.loss[m.node] = m;
   if (m.type === "threshold") { $("th-temp").value = m.temp; $("th-gas").value = m.gas; }
   render();
 }
@@ -93,8 +91,6 @@ function render() {
   drawCurve($("c-temp"), state.hist.temp, getComputedStyle(document.body).getPropertyValue("--pyro"));
   drawCurve($("c-hum"), state.hist.hum, getComputedStyle(document.body).getPropertyValue("--hydro"));
   drawCurve($("c-gas"), state.hist.gas, getComputedStyle(document.body).getPropertyValue("--anemo"));
-  const l2 = state.loss[2];
-  $("loss-info").textContent = l2 ? `节点2丢包 ${l2.lost}/${l2.total}` : "丢包率 --";
   $("alarm-banner").hidden = !state.alarm.on;
   $("btn-test-off").hidden = !state.alarm.on;
   document.querySelectorAll(".node-card").forEach(c => c.classList.remove("alarm"));

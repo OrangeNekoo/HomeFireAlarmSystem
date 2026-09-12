@@ -80,7 +80,6 @@ main { display: flex; gap: 16px; padding: 16px; }
 .reading { flex: 1; min-width: 0; }
 .metric .val { font-family: var(--black); font-weight: 900; font-size: 26px; }
 .metric canvas { display: block; margin-top: 6px; max-width: 100%; }
-#loss-info { font-size: 12px; padding: 0 2px; }
 
 /* ── footer 控制台 ── */
 #console { border-top: 1px solid #000; padding: 16px; }
