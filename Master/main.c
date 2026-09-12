@@ -15,6 +15,7 @@
 #define EASTER_BUTTON_SAMPLE_MS 10
 #define EASTER_BUTTON_DEBOUNCE_MS 30
 #define EASTER_FRAME_MS 100
+#define OFFLINE_TIMEOUT_MS 10000
 #define LED_ALARM P0_5                   /* 低电平点亮 */
 
 typedef struct {
@@ -46,16 +47,30 @@ static void draw_time_row(void)
 static void draw_values(void)      /* 局部刷新三行数值，不清屏避免闪烁 */
 {
     char b[17];
-    /* 温度行：温度:xx.x℃ */
+    /* 温度行：温度:xx.x℃，节点2离线时显示离线 */
     LCD_P16x16Ch(0, 2, 0); LCD_P16x16Ch(16, 2, 2);
-    b[0]=':'; b[1]='0'+n2.temp_i/10; b[2]='0'+n2.temp_i%10;
-    b[3]='.'; b[4]='0'+n2.temp_d; b[5]='\0';
-    LCD_P8x16Str(32, 2, (u8 *)b); LCD_P16x16Ch(72, 2, 16);
+    if(!n2.online)
+    {
+        LCD_P16x16Ch(32, 2, 14); LCD_P16x16Ch(48, 2, 15);
+    }
+    else
+    {
+        b[0]=':'; b[1]='0'+n2.temp_i/10; b[2]='0'+n2.temp_i%10;
+        b[3]='.'; b[4]='0'+n2.temp_d; b[5]='\0';
+        LCD_P8x16Str(32, 2, (u8 *)b); LCD_P16x16Ch(72, 2, 16);
+    }
     /* 湿度行：湿度:xx.x% */
     LCD_P16x16Ch(0, 4, 1); LCD_P16x16Ch(16, 4, 2);
-    b[0]=':'; b[1]='0'+n2.hum_i/10; b[2]='0'+n2.hum_i%10;
-    b[3]='.'; b[4]='0'+n2.hum_d; b[5]='%'; b[6]='\0';
-    LCD_P8x16Str(32, 4, (u8 *)b);
+    if(!n2.online)
+    {
+        LCD_P16x16Ch(32, 4, 14); LCD_P16x16Ch(48, 4, 15);
+    }
+    else
+    {
+        b[0]=':'; b[1]='0'+n2.hum_i/10; b[2]='0'+n2.hum_i%10;
+        b[3]='.'; b[4]='0'+n2.hum_d; b[5]='%'; b[6]='\0';
+        LCD_P8x16Str(32, 4, (u8 *)b);
+    }
     /* 有害气体行：正常/异常/离线（gas_do=1 为超阈异常，与 GasNode d[3] 语义一致） */
     LCD_P16x16Ch(0, 6, 3); LCD_P16x16Ch(16, 6, 4);
     LCD_P16x16Ch(32, 6, 5); LCD_P16x16Ch(48, 6, 6);
@@ -209,10 +224,10 @@ static void handle_rf(void)               /* 序号连续性统计丢包 */
 static void check_offline(void)              /* 1s 调一次；10s 无心跳判离线 */
 {
     u32 now = ms_get();
-    if(n2.online && now - n2.last_ms > 10000)
-    { n2.online = 0; csv_send_status(2, 0); csv_send_loss(2, n2.loss, n2.total); if(!alarm_on) draw_values(); }
-    if(n3.online && now - n3.last_ms > 10000)
-    { n3.online = 0; csv_send_status(3, 0); csv_send_loss(3, n3.loss, n3.total); if(!alarm_on) draw_values(); }
+    if(n2.online && now - n2.last_ms >= OFFLINE_TIMEOUT_MS)
+    { n2.online = 0; csv_send_status(2, 0); csv_send_loss(2, n2.loss, n2.total); if(!alarm_on && !easter_on) draw_values(); }
+    if(n3.online && now - n3.last_ms >= OFFLINE_TIMEOUT_MS)
+    { n3.online = 0; csv_send_status(3, 0); csv_send_loss(3, n3.loss, n3.total); if(!alarm_on && !easter_on) draw_values(); }
 }
 void main(void)
 {

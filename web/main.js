@@ -1,8 +1,8 @@
 /* web/main.js */
 const state = {
   nodes: {
-    2: { online: false, temp: null, hum: null },
-    3: { online: false, gas: null, do: null },
+    2: { online: false, temp: null, hum: null, lastDataTs: 0, offlineByStatus: false },
+    3: { online: false, gas: null, do: null, lastDataTs: 0, offlineByStatus: false },
   },
   alarm: { on: false, src: 0 },
   hist: { temp: [], hum: [], gas: [] },
@@ -34,6 +34,7 @@ const easterOverlay = $("easter-overlay"), easterFrame = $("easter-frame");
 const audio = $("easter-audio");
 const easterAudioButton = $("easter-enable-audio");
 let easterTimer = null, easterIndex = 0;
+const OFFLINE_TIMEOUT_MS = 11000;
 const clockEl = $("clock"), linkEl = $("link-info");
 
 function easterFramePath(index) { return EASTER_FRAME_MANIFEST[index]; }
@@ -98,15 +99,38 @@ function sendCmd(obj) {
 
 /* ---------- 消息处理 ---------- */
 function handleMsg(m) {
-  if (m.type === "data" && m.node === 2) { state.nodes[2] = { online: true, temp: m.temp, hum: m.hum };
-    pushHist("temp", m.temp); pushHist("hum", m.hum); }
-  if (m.type === "data" && m.node === 3) { state.nodes[3] = { online: true, gas: m.gas, do: m.do };
-    pushHist("gas", m.gas); }
-  if (m.type === "status" && state.nodes[m.node]) { state.nodes[m.node].online = m.online; }
+  if (m.type === "data" && m.node === 2) {
+    const node = state.nodes[2];
+    node.temp = m.temp; node.hum = m.hum; node.lastDataTs = Date.now();
+    if (!state.demo || !node.offlineByStatus) node.online = true;
+    pushHist("temp", m.temp); pushHist("hum", m.hum);
+  }
+  if (m.type === "data" && m.node === 3) {
+    const node = state.nodes[3];
+    node.gas = m.gas; node.do = m.do; node.lastDataTs = Date.now();
+    if (!state.demo || !node.offlineByStatus) node.online = true;
+    pushHist("gas", m.gas);
+  }
+  if (m.type === "status" && state.nodes[m.node]) {
+    state.nodes[m.node].online = m.online;
+    state.nodes[m.node].offlineByStatus = !m.online;
+    if (!m.online) state.nodes[m.node].lastDataTs = 0;
+  }
   if (m.type === "alarm") state.alarm = { on: m.on, src: m.src };
   if (m.type === "easterEgg") setEaster(m.on);
   if (m.type === "threshold") { $("th-temp").value = m.temp; $("th-gas").value = m.gas; }
   render();
+}
+
+function checkNodeFreshness() {
+  const now = Date.now();
+  [2, 3].forEach(nodeId => {
+    const node = state.nodes[nodeId];
+    if (node.online && node.lastDataTs && now - node.lastDataTs >= OFFLINE_TIMEOUT_MS) {
+      node.online = false;
+      render();
+    }
+  });
 }
 
 /* ---------- 演示模式 ---------- */
@@ -146,12 +170,14 @@ function drawCurve(canvas, arr, color) {
 function render() {
   const n2 = state.nodes[2], n3 = state.nodes[3];
   $("card-temp").classList.toggle("online", n2.online);
+  $("card-temp").querySelector(".node-state").textContent = n2.online ? "状态：ONLINE" : "状态：OFFLINE";
   $("card-temp-data").textContent = n2.online ? `${n2.temp} ℃ / ${n2.hum} %` : "-- ℃ / -- %";
   $("card-gas").classList.toggle("online", n3.online);
+  $("card-gas").querySelector(".node-state").textContent = n3.online ? "状态：ONLINE" : "状态：OFFLINE";
   $("card-gas-data").textContent = n3.online ? `ADC ${n3.gas}` : "ADC --";
-  $("v-temp").textContent = n2.temp ?? "--";
-  $("v-hum").textContent = n2.hum ?? "--";
-  $("v-gas").textContent = n3.gas ?? "--";
+  $("v-temp").textContent = n2.online ? n2.temp : "--";
+  $("v-hum").textContent = n2.online ? n2.hum : "--";
+  $("v-gas").textContent = n3.online ? n3.gas : "--";
   drawCurve($("c-temp"), state.hist.temp, getComputedStyle(document.body).getPropertyValue("--pyro"));
   drawCurve($("c-hum"), state.hist.hum, getComputedStyle(document.body).getPropertyValue("--hydro"));
   drawCurve($("c-gas"), state.hist.gas, getComputedStyle(document.body).getPropertyValue("--anemo"));
@@ -175,5 +201,6 @@ setInterval(() => {
   clockEl.textContent = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
 }, 1000);
 
+setInterval(checkNodeFreshness, 1000);
 connectWS();
 setTimeout(() => { if (!ws || ws.readyState !== 1) enterDemo(); }, 2000);  // 2s 连不上进演示

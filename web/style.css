@@ -64,10 +64,7 @@ main { display: flex; gap: 16px; padding: 16px; }
 
 .node-name { font-weight: 700; }
 .node-state { font-size: 12px; color: #333; }
-.node-card.online .node-state { font-size: 0; color: transparent; }
-.node-card.online .node-state::after {
-  content: "状态：ONLINE"; font-size: 12px; color: #000;
-  font-family: var(--sans); font-weight: 700; }
+.node-card.online .node-state { font-size: 12px; color: #000; font-family: var(--sans); font-weight: 700; }
 .node-data { font-size: 18px; font-weight: 700; }
 .node-card .node-state { display: block; margin-top: 4px; }
 
